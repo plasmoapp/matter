@@ -94,10 +94,10 @@ index 5722d9b30223fb229b80f54d7fb9edf41254a7f7..f0dc9c709659293d5e7b78a5e8f4fa6c
              if (random.nextInt(10) == 0 && flag && pos.getY() < 40) {
                  return checkMobSpawnRules(type, world, spawnReason, pos, random);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-index 96cb3e8cad9e7a5edd2a448ea88f2447104fbb5a..0a7ecec8f5f178b2ef8a9b79c6fd842a84c0d3d4 100644
+index 96cb3e8cad9e7a5edd2a448ea88f2447104fbb5a..c715706633508817a194ee1d5c29a21394adf8db 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-@@ -36,12 +36,6 @@ import net.minecraft.world.level.block.Block;
+@@ -36,12 +36,7 @@ import net.minecraft.world.level.block.Block;
  import net.minecraft.world.level.block.entity.BlockEntity;
  import net.minecraft.world.level.block.state.BlockState;
  import net.minecraft.world.level.gameevent.GameEventDispatcher;
@@ -107,10 +107,11 @@ index 96cb3e8cad9e7a5edd2a448ea88f2447104fbb5a..0a7ecec8f5f178b2ef8a9b79c6fd842a
 -import net.minecraft.world.level.levelgen.NoiseChunk;
 -import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 -import net.minecraft.world.level.levelgen.NoiseSampler;
++import net.minecraft.world.level.levelgen.*;
  import net.minecraft.world.level.levelgen.blending.Blender;
  import net.minecraft.world.level.levelgen.blending.BlendingData;
  import net.minecraft.world.level.levelgen.feature.StructureFeature;
-@@ -51,6 +45,7 @@ import net.minecraft.world.ticks.SerializableTickContainer;
+@@ -51,6 +46,7 @@ import net.minecraft.world.ticks.SerializableTickContainer;
  import net.minecraft.world.ticks.TickContainerAccess;
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
@@ -118,7 +119,7 @@ index 96cb3e8cad9e7a5edd2a448ea88f2447104fbb5a..0a7ecec8f5f178b2ef8a9b79c6fd842a
  
  public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiomeSource, FeatureAccess {
  
-@@ -77,6 +72,11 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
+@@ -77,6 +73,11 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
      protected final LevelHeightAccessor levelHeightAccessor;
      protected final LevelChunkSection[] sections;
  
@@ -130,7 +131,7 @@ index 96cb3e8cad9e7a5edd2a448ea88f2447104fbb5a..0a7ecec8f5f178b2ef8a9b79c6fd842a
      // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
      private static final org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry();
      public org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer persistentDataContainer = new org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer(ChunkAccess.DATA_TYPE_REGISTRY);
-@@ -147,6 +147,17 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
+@@ -147,6 +148,17 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
      public final Registry<Biome> biomeRegistry;
      // CraftBukkit end
  
