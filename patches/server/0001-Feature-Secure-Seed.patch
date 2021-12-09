@@ -47,57 +47,6 @@ index 218f5bafeed8551b55b91c7fccaf6935c8b631ca..baa89acd8afef8966f1be968537b53ad
  
                  metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", () -> {
                      String minecraftVersion = Bukkit.getVersion();
-diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index ece77f5ea4b14bbed7c070131b3251ea86764538..9d81e84b08ecdfe245f2e3a2853a299ff10c64de 100644
---- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-+++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-@@ -20,7 +20,7 @@ import java.util.stream.StreamSupport;
- public class PaperVersionFetcher implements VersionFetcher {
-     private static final java.util.regex.Pattern VER_PATTERN = java.util.regex.Pattern.compile("^([0-9\\.]*)\\-.*R"); // R is an anchor, will always give '-R' at end
-     private static final String GITHUB_BRANCH_NAME = "master";
--    private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads";
-+    private static final String DOWNLOAD_PAGE = "https://matter.plo.su/job/Matter-"; // Matter
-     private static @Nullable String mcVer;
- 
-     @Override
-@@ -31,8 +31,8 @@ public class PaperVersionFetcher implements VersionFetcher {
-     @Nonnull
-     @Override
-     public Component getVersionMessage(@Nonnull String serverVersion) {
--        String[] parts = serverVersion.substring("git-Paper-".length()).split("[-\\s]");
--        final Component updateMessage = getUpdateStatusMessage("PaperMC/Paper", GITHUB_BRANCH_NAME, parts[0]);
-+        String[] parts = serverVersion.substring("git-Matter-".length()).split("[-\\s]"); // Matter
-+        final Component updateMessage = getUpdateStatusMessage("plasmoapp/matter", GITHUB_BRANCH_NAME, parts[0]); // Matter
-         final Component history = getHistory();
- 
-         return history != null ? TextComponent.ofChildren(updateMessage, Component.newline(), history) : updateMessage;
-@@ -45,7 +45,7 @@ public class PaperVersionFetcher implements VersionFetcher {
-                 String result = matcher.group();
-                 mcVer = result.substring(0, result.length() - 2); // strip 'R' anchor and trailing '-'
-             } else {
--                org.bukkit.Bukkit.getLogger().warning("Unable to match version to pattern! Report to PaperMC!");
-+                org.bukkit.Bukkit.getLogger().warning("Unable to match version to pattern! Report to Matter!"); // Matter
-                 org.bukkit.Bukkit.getLogger().warning("Pattern: " + VER_PATTERN.toString());
-                 org.bukkit.Bukkit.getLogger().warning("Version: " + org.bukkit.Bukkit.getBukkitVersion());
-             }
-@@ -75,7 +75,7 @@ public class PaperVersionFetcher implements VersionFetcher {
-                 return Component.text("You are " + distance + " version(s) behind", NamedTextColor.YELLOW)
-                         .append(Component.newline())
-                         .append(Component.text("Download the new version at: ")
--                                .append(Component.text(DOWNLOAD_PAGE, NamedTextColor.GOLD)
-+                                .append(Component.text(DOWNLOAD_PAGE + getMinecraftVersion(), NamedTextColor.GOLD) // Matter
-                                         .hoverEvent(Component.text("Click to open", NamedTextColor.WHITE))
-                                         .clickEvent(ClickEvent.openUrl(DOWNLOAD_PAGE))));
-         }
-@@ -85,7 +85,7 @@ public class PaperVersionFetcher implements VersionFetcher {
-         if (siteApiVersion == null) { return -1; }
-         try {
-             try (BufferedReader reader = Resources.asCharSource(
--                new URL("https://papermc.io/api/v2/projects/paper/versions/" + siteApiVersion),
-+                new URL("https://api.matter.plo.su/versions/" + siteApiVersion), // Matter
-                 Charsets.UTF_8
-             ).openBufferedStream()) {
-                 JsonObject json = new Gson().fromJson(reader, JsonObject.class);
 diff --git a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
 index e0b1f0671d16ddddcb6725acd25a1d1d69e42701..63384b9353e71e9d310528235f1a39d58489ae55 100644
 --- a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
