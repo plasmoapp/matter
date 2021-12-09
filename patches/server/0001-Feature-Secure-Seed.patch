@@ -5,7 +5,7 @@ Subject: [PATCH] Feature Secure Seed
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 5678a9f8d2aa8a7afbc5729570ec297b12acf75d..f5733430deb3f5160397e43a45c2d363bd0c3e99 100644
+index 5678a9f8d2aa8a7afbc5729570ec297b12acf75d..9fb7e9c7c1bdecd68943b6fd1d43fa1801d35a0e 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -18,8 +18,14 @@ repositories {
@@ -26,14 +26,14 @@ index 5678a9f8d2aa8a7afbc5729570ec297b12acf75d..f5733430deb3f5160397e43a45c2d363
      implementation("org.jline:jline-terminal-jansi:3.21.0")
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
 diff --git a/src/main/java/net/minecraft/server/commands/SeedCommand.java b/src/main/java/net/minecraft/server/commands/SeedCommand.java
-index 6f4aa3fce42a53883db1485731e03822887cadc0..90c95dd0d686e78c6df4a0c24a3a867d7ff9d21e 100644
+index 6f4aa3fce42a53883db1485731e03822887cadc0..6d519ce617c99410c32ab2f9cd28fc4e3cb9f6f7 100644
 --- a/src/main/java/net/minecraft/server/commands/SeedCommand.java
 +++ b/src/main/java/net/minecraft/server/commands/SeedCommand.java
 @@ -10,6 +10,7 @@ import net.minecraft.network.chat.ComponentUtils;
  import net.minecraft.network.chat.HoverEvent;
  import net.minecraft.network.chat.TextComponent;
  import net.minecraft.network.chat.TranslatableComponent;
-+import su.plo.secure.Globals;
++import su.plo.matter.Globals;
  
  public class SeedCommand {
      public static void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
@@ -59,14 +59,14 @@ index 6f4aa3fce42a53883db1485731e03822887cadc0..90c95dd0d686e78c6df4a0c24a3a867d
          }));
      }
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index e7e110b53e79e0606262982555dd9eb096c7c4a8..f267bb064df9f2547dcd49d5273d8fe03ea8bb45 100644
+index e7e110b53e79e0606262982555dd9eb096c7c4a8..bb7e77e22b58250b687d9df429a982ca038c9aa7 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -49,6 +49,8 @@ import net.minecraft.world.level.storage.LevelStorageSource;
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap; // Paper
-+import su.plo.secure.Globals;
++import su.plo.matter.Globals;
 +
  import java.util.function.Function; // Paper
  
@@ -94,10 +94,10 @@ index 5722d9b30223fb229b80f54d7fb9edf41254a7f7..f0dc9c709659293d5e7b78a5e8f4fa6c
              if (random.nextInt(10) == 0 && flag && pos.getY() < 40) {
                  return checkMobSpawnRules(type, world, spawnReason, pos, random);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-index 96cb3e8cad9e7a5edd2a448ea88f2447104fbb5a..f20262677938917f0cd31f7ec640f5f7c848e92b 100644
+index 96cb3e8cad9e7a5edd2a448ea88f2447104fbb5a..0a7ecec8f5f178b2ef8a9b79c6fd842a84c0d3d4 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-@@ -36,12 +36,7 @@ import net.minecraft.world.level.block.Block;
+@@ -36,12 +36,6 @@ import net.minecraft.world.level.block.Block;
  import net.minecraft.world.level.block.entity.BlockEntity;
  import net.minecraft.world.level.block.state.BlockState;
  import net.minecraft.world.level.gameevent.GameEventDispatcher;
@@ -107,19 +107,18 @@ index 96cb3e8cad9e7a5edd2a448ea88f2447104fbb5a..f20262677938917f0cd31f7ec640f5f7
 -import net.minecraft.world.level.levelgen.NoiseChunk;
 -import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 -import net.minecraft.world.level.levelgen.NoiseSampler;
-+import net.minecraft.world.level.levelgen.*;
  import net.minecraft.world.level.levelgen.blending.Blender;
  import net.minecraft.world.level.levelgen.blending.BlendingData;
  import net.minecraft.world.level.levelgen.feature.StructureFeature;
-@@ -51,6 +46,7 @@ import net.minecraft.world.ticks.SerializableTickContainer;
+@@ -51,6 +45,7 @@ import net.minecraft.world.ticks.SerializableTickContainer;
  import net.minecraft.world.ticks.TickContainerAccess;
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.WorldgenCryptoRandom;
  
  public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiomeSource, FeatureAccess {
  
-@@ -77,6 +73,11 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
+@@ -77,6 +72,11 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
      protected final LevelHeightAccessor levelHeightAccessor;
      protected final LevelChunkSection[] sections;
  
@@ -131,7 +130,7 @@ index 96cb3e8cad9e7a5edd2a448ea88f2447104fbb5a..f20262677938917f0cd31f7ec640f5f7
      // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
      private static final org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry();
      public org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer persistentDataContainer = new org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer(ChunkAccess.DATA_TYPE_REGISTRY);
-@@ -147,6 +148,17 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
+@@ -147,6 +147,17 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
      public final Registry<Biome> biomeRegistry;
      // CraftBukkit end
  
@@ -150,15 +149,15 @@ index 96cb3e8cad9e7a5edd2a448ea88f2447104fbb5a..f20262677938917f0cd31f7ec640f5f7
          for (int i = 0; i < sectionArray.length; ++i) {
              if (sectionArray[i] == null) {
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
-index e4591c0b3c8547cc6f4e2a0891fc378ee4334d9e..02cd49d1ec81df86e938686075e235e02bb98d8a 100644
+index e4591c0b3c8547cc6f4e2a0891fc378ee4334d9e..d05d67240a368e3a7352fe59a5803893f5bd6eba 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 @@ -68,6 +68,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
  import net.minecraft.world.level.levelgen.structure.BoundingBox;
  import net.minecraft.world.level.levelgen.structure.StructureStart;
  import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
  
  public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
  
@@ -189,14 +188,14 @@ index e4591c0b3c8547cc6f4e2a0891fc378ee4334d9e..02cd49d1ec81df86e938686075e235e0
  
              if (this instanceof FlatLevelSource) {
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java b/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java
-index 6c72854aa975800bd6160d104936a5ba978f4d67..be7bf237b1f885f00779ad1d043359d8abc31c9a 100644
+index 6c72854aa975800bd6160d104936a5ba978f4d67..92730e36dd413b40b2d448601b59ff4f5f07641f 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java
 @@ -26,6 +26,7 @@ import net.minecraft.world.level.levelgen.GenerationStep;
  import net.minecraft.world.level.levelgen.Heightmap;
  import net.minecraft.world.level.levelgen.blending.Blender;
  import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
-+import su.plo.secure.Globals;
++import su.plo.matter.Globals;
  
  public class ChunkStatus {
  
@@ -210,7 +209,7 @@ index 6c72854aa975800bd6160d104936a5ba978f4d67..be7bf237b1f885f00779ad1d043359d8
          ProfiledDuration profiledduration = JvmProfiler.INSTANCE.onChunkGenerate(ichunkaccess.getPos(), world.dimension(), this.name);
          CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> completablefuture = this.generationTask.doWork(this, executor, world, generator, structureManager, lightingProvider, fullChunkConverter, chunks, ichunkaccess, flag);
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java b/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java
-index 286c75989282c6d370ca64ac714ab15d784210ab..f07a9b04821edcc8fe7d995168a4023182d2e4dd 100644
+index 286c75989282c6d370ca64ac714ab15d784210ab..085b498cd764e853f303f95155aaefe2203d85d7 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java
 @@ -20,6 +20,8 @@ import java.util.Properties;
@@ -226,7 +225,7 @@ index 286c75989282c6d370ca64ac714ab15d784210ab..f07a9b04821edcc8fe7d995168a40231
  import net.minecraft.core.RegistryAccess;
  // CraftBukkit start
  import net.minecraft.resources.RegistryReadOps;
-+import su.plo.secure.Globals;
++import su.plo.matter.Globals;
  
  public class WorldGenSettings {
 -
@@ -418,7 +417,7 @@ index 286c75989282c6d370ca64ac714ab15d784210ab..f07a9b04821edcc8fe7d995168a40231
  
          return generatorsettings;
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
-index 61fc0485c4896b62f74b92c3b4b93f22cbfb3ed7..8158bf845f962b041fa5472080d6c0430074fcb4 100644
+index 61fc0485c4896b62f74b92c3b4b93f22cbfb3ed7..1b41d187e44217d533835dac3cb79e2d5f29fd7e 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
 @@ -1,10 +1,11 @@
@@ -429,8 +428,8 @@ index 61fc0485c4896b62f74b92c3b4b93f22cbfb3ed7..8158bf845f962b041fa5472080d6c043
  import net.minecraft.world.level.levelgen.WorldgenRandom;
  import net.minecraft.world.level.levelgen.feature.configurations.JigsawConfiguration;
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
  
  public class BastionFeature extends JigsawFeature {
      private static final int BASTION_SPAWN_HEIGHT = 33;
@@ -449,7 +448,7 @@ index 61fc0485c4896b62f74b92c3b4b93f22cbfb3ed7..8158bf845f962b041fa5472080d6c043
      }
  }
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java
-index c4ec2e41314da9501dc62baa024607b2782d2c73..b2e0e95fc80a85845bc5128cf67e551b441c6a52 100644
+index c4ec2e41314da9501dc62baa024607b2782d2c73..01e44d84a8bddb98a2463028c6ea992db89b7cc8 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java
 @@ -4,13 +4,14 @@ import com.mojang.serialization.Codec;
@@ -463,8 +462,8 @@ index c4ec2e41314da9501dc62baa024607b2782d2c73..b2e0e95fc80a85845bc5128cf67e551b
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
  import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
  
  public class BuriedTreasureFeature extends StructureFeature<ProbabilityFeatureConfiguration> {
      private static final int RANDOM_SALT = 10387320;
@@ -483,15 +482,15 @@ index c4ec2e41314da9501dc62baa024607b2782d2c73..b2e0e95fc80a85845bc5128cf67e551b
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
-index 24110d4d412b5bd0a6c17215b889ea6c02558a2c..663cd7615fe36af5e39c59acd904dd4d35a3eecd 100644
+index 24110d4d412b5bd0a6c17215b889ea6c02558a2c..afb23e32ed7ec4f389be09afdce758b3b967f3f3 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
 @@ -24,6 +24,8 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
  import net.minecraft.world.level.levelgen.feature.configurations.GeodeConfiguration;
  import net.minecraft.world.level.levelgen.synth.NormalNoise;
  import net.minecraft.world.level.material.FluidState;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
  
  public class GeodeFeature extends Feature<GeodeConfiguration> {
      private static final Direction[] DIRECTIONS = Direction.values();
@@ -506,7 +505,7 @@ index 24110d4d412b5bd0a6c17215b889ea6c02558a2c..663cd7615fe36af5e39c59acd904dd4d
          List<BlockPos> list2 = Lists.newLinkedList();
          double d = (double)k / (double)geodeConfiguration.outerWallDistance.getMaxValue();
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java
-index 45f11284bf65081b3b2e8da85114efbe5efd5b42..5b87ca415a0dd3429f98b8ab0ecfc4be08f08c37 100644
+index 45f11284bf65081b3b2e8da85114efbe5efd5b42..6f9bd5820acf6185fdef57c6b446c1c4c2e8cb05 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java
 @@ -1,9 +1,6 @@
@@ -530,8 +529,8 @@ index 45f11284bf65081b3b2e8da85114efbe5efd5b42..5b87ca415a0dd3429f98b8ab0ecfc4be
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
  import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
 +
 +import java.util.Arrays;
 +import java.util.Map;
@@ -554,15 +553,15 @@ index 45f11284bf65081b3b2e8da85114efbe5efd5b42..5b87ca415a0dd3429f98b8ab0ecfc4be
          return worldgenRandom.nextDouble() >= d ? false : context.validBiome().test(context.chunkGenerator().getNoiseBiome(QuartPos.fromBlock(context.chunkPos().getMiddleBlockX()), QuartPos.fromBlock(50), QuartPos.fromBlock(context.chunkPos().getMiddleBlockZ())));
      }
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/NetherFortressFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/NetherFortressFeature.java
-index c833506d8b5b046e25532823c3501e4c1cfaf52e..25b3690d1e15a66e8739a880ccc953894da7bf34 100644
+index c833506d8b5b046e25532823c3501e4c1cfaf52e..659ac982bac21eaed5b784f7a89351174f6b5819 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/NetherFortressFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/NetherFortressFeature.java
 @@ -14,6 +14,8 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
  import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
  
  public class NetherFortressFeature extends StructureFeature<NoneFeatureConfiguration> {
      public static final WeightedRandomList<MobSpawnSettings.SpawnerData> FORTRESS_ENEMIES = WeightedRandomList.create(new MobSpawnSettings.SpawnerData(EntityType.BLAZE, 10, 2, 3), new MobSpawnSettings.SpawnerData(EntityType.ZOMBIFIED_PIGLIN, 5, 4, 4), new MobSpawnSettings.SpawnerData(EntityType.WITHER_SKELETON, 8, 5, 5), new MobSpawnSettings.SpawnerData(EntityType.SKELETON, 2, 5, 5), new MobSpawnSettings.SpawnerData(EntityType.MAGMA_CUBE, 3, 4, 4));
@@ -581,7 +580,7 @@ index c833506d8b5b046e25532823c3501e4c1cfaf52e..25b3690d1e15a66e8739a880ccc95389
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/OceanMonumentFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/OceanMonumentFeature.java
-index bcfd54e917a638815813b89ab794cdc259b89cae..c794c7f1545764c89ee994f90c8129e379ee66a5 100644
+index bcfd54e917a638815813b89ab794cdc259b89cae..2b91c0baa02b8c864ff541a675c21012e0d1ecb1 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/OceanMonumentFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/OceanMonumentFeature.java
 @@ -1,7 +1,6 @@
@@ -605,8 +604,8 @@ index bcfd54e917a638815813b89ab794cdc259b89cae..c794c7f1545764c89ee994f90c8129e3
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
  import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
  import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
 +
 +import java.util.Objects;
  
@@ -626,15 +625,15 @@ index bcfd54e917a638815813b89ab794cdc259b89cae..c794c7f1545764c89ee994f90c8129e3
              StructurePiece structurePiece = pieces.pieces().get(0);
              BoundingBox boundingBox = structurePiece.getBoundingBox();
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/PillagerOutpostFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/PillagerOutpostFeature.java
-index 406749054596d560384db75defb18db2c1ed2ea5..77410613e0e45070b43e36748809f824417c183a 100644
+index 406749054596d560384db75defb18db2c1ed2ea5..37eae86ac9adc001c5c3e278ccb7b12bc99ce0a9 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/PillagerOutpostFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/PillagerOutpostFeature.java
 @@ -11,6 +11,8 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
  import net.minecraft.world.level.levelgen.feature.configurations.JigsawConfiguration;
  import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
  
  public class PillagerOutpostFeature extends JigsawFeature {
      public static final WeightedRandomList<MobSpawnSettings.SpawnerData> OUTPOST_ENEMIES = WeightedRandomList.create(new MobSpawnSettings.SpawnerData(EntityType.PILLAGER, 1, 1, 1));
@@ -653,7 +652,7 @@ index 406749054596d560384db75defb18db2c1ed2ea5..77410613e0e45070b43e36748809f824
          if (worldgenRandom.nextInt(5) != 0) {
              return false;
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/RuinedPortalFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/RuinedPortalFeature.java
-index b34750b7165ff3ec2f703d29040099f160fe6c78..76996f295b4dedc9c401460f0b3ecbb4b18a8ac7 100644
+index b34750b7165ff3ec2f703d29040099f160fe6c78..8fe23e39e7d1e6113d2e19b759f29468d75a11bc 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/RuinedPortalFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/RuinedPortalFeature.java
 @@ -2,12 +2,6 @@ package net.minecraft.world.level.levelgen.feature;
@@ -681,8 +680,8 @@ index b34750b7165ff3ec2f703d29040099f160fe6c78..76996f295b4dedc9c401460f0b3ecbb4
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
  import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
 +
 +import java.util.*;
 +import java.util.stream.Collectors;
@@ -704,15 +703,15 @@ index b34750b7165ff3ec2f703d29040099f160fe6c78..76996f295b4dedc9c401460f0b3ecbb4
          if (ruinedPortalConfiguration.portalType == RuinedPortalFeature.Type.DESERT) {
              verticalPlacement = RuinedPortalPiece.VerticalPlacement.PARTLY_BURIED;
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/StructureFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/StructureFeature.java
-index 461464a4208bbb09800d87bcdb54978758863c7b..a7c9f53ee00a56a4d6d8f82026be10da3181c39e 100644
+index 461464a4208bbb09800d87bcdb54978758863c7b..8286d7384be4914e5c0853c0ce4359948befc1de 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/StructureFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/StructureFeature.java
 @@ -54,6 +54,8 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilde
  import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
  
  public class StructureFeature<C extends FeatureConfiguration> {
      public static final BiMap<String, StructureFeature<?>> STRUCTURES_REGISTRY = HashBiMap.create();
@@ -745,7 +744,7 @@ index 461464a4208bbb09800d87bcdb54978758863c7b..a7c9f53ee00a56a4d6d8f82026be10da
                  StructureStart<C> structureStart = new StructureStart<>(this, pos, structureReferences, structurePiecesBuilder.build());
                  if (structureStart.isValid()) {
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/WoodlandMansionFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/WoodlandMansionFeature.java
-index ef068df9d6ac363509ca5828e7dc8dcba4cec2a3..e399efdf53ec74525e7003c004c42f7497df8484 100644
+index ef068df9d6ac363509ca5828e7dc8dcba4cec2a3..f0ac9c344814d3d8fc2309dfb003a9a1ab080069 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/WoodlandMansionFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/WoodlandMansionFeature.java
 @@ -2,9 +2,6 @@ package net.minecraft.world.level.levelgen.feature;
@@ -770,8 +769,8 @@ index ef068df9d6ac363509ca5828e7dc8dcba4cec2a3..e399efdf53ec74525e7003c004c42f74
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
  import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
 +
 +import java.util.List;
 +import java.util.Optional;
@@ -794,7 +793,7 @@ index ef068df9d6ac363509ca5828e7dc8dcba4cec2a3..e399efdf53ec74525e7003c004c42f74
          int i = 5;
          int j = 5;
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/structures/JigsawPlacement.java b/src/main/java/net/minecraft/world/level/levelgen/feature/structures/JigsawPlacement.java
-index ccc08dc68ebccb30995983f029c14d6e1272417b..9d1acbf9e84de841a986a8e1bac8502719197c22 100644
+index ccc08dc68ebccb30995983f029c14d6e1272417b..eac69fb26451fe478002f44a187ec6014f84220a 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/structures/JigsawPlacement.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/structures/JigsawPlacement.java
 @@ -2,17 +2,7 @@ package net.minecraft.world.level.levelgen.feature.structures;
@@ -828,8 +827,8 @@ index ccc08dc68ebccb30995983f029c14d6e1272417b..9d1acbf9e84de841a986a8e1bac85027
  import org.apache.commons.lang3.mutable.MutableObject;
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
 +
 +import java.util.*;
 +import java.util.function.Predicate;
@@ -876,15 +875,15 @@ index ccc08dc68ebccb30995983f029c14d6e1272417b..9d1acbf9e84de841a986a8e1bac85027
                                      }).max().orElse(0);
                                  } else {
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/NetherFossilFeature.java b/src/main/java/net/minecraft/world/level/levelgen/structure/NetherFossilFeature.java
-index 66dc81f3116b10df660fc37c392ce55bde0e2ffe..0155605e6547a30d82fe476f183cbb8f5b3e9bb5 100644
+index 66dc81f3116b10df660fc37c392ce55bde0e2ffe..59e2ece2367e138aec88b8ac09d5b8dbe5742923 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/structure/NetherFossilFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/structure/NetherFossilFeature.java
 @@ -15,6 +15,8 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
  import net.minecraft.world.level.levelgen.feature.configurations.RangeConfiguration;
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
  import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
-+import su.plo.secure.Globals;
-+import su.plo.secure.WorldgenCryptoRandom;
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
  
  public class NetherFossilFeature extends NoiseAffectingStructureFeature<RangeConfiguration> {
      public NetherFossilFeature(Codec<RangeConfiguration> configCodec) {
@@ -903,10 +902,10 @@ index 66dc81f3116b10df660fc37c392ce55bde0e2ffe..0155605e6547a30d82fe476f183cbb8f
          int j = context.chunkPos().getMinBlockZ() + worldgenRandom.nextInt(16);
          int k = context.chunkGenerator().getSeaLevel();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index db344e5b9f96f317a232304587e6b1673fc6067d..9a2d1a9b210eb1c0f6f61939dded30a69c7c62fc 100644
+index ca9282a0e608541837573d155bf9b95a105ba87d..64025cdf312c6c9261e21a8c5a9d3c168764c2b4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-@@ -205,7 +205,7 @@ public class CraftChunk implements Chunk {
+@@ -206,7 +206,7 @@ public class CraftChunk implements Chunk {
      @Override
      public boolean isSlimeChunk() {
          // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
@@ -915,13 +914,13 @@ index db344e5b9f96f317a232304587e6b1673fc6067d..9a2d1a9b210eb1c0f6f61939dded30a6
      }
  
      @Override
-diff --git a/src/main/java/su/plo/secure/Globals.java b/src/main/java/su/plo/secure/Globals.java
+diff --git a/src/main/java/su/plo/matter/Globals.java b/src/main/java/su/plo/matter/Globals.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..2261001a90ba78ed4610efd21d4e663b1a216cc9
+index 0000000000000000000000000000000000000000..744c6072ee1b6bf87d4d7af6f25650dc81e6a2d1
 --- /dev/null
-+++ b/src/main/java/su/plo/secure/Globals.java
++++ b/src/main/java/su/plo/matter/Globals.java
 @@ -0,0 +1,81 @@
-+package su.plo.secure;
++package su.plo.matter;
 +
 +import com.google.common.collect.Iterables;
 +import net.minecraft.server.level.ServerLevel;
@@ -1002,13 +1001,13 @@ index 0000000000000000000000000000000000000000..2261001a90ba78ed4610efd21d4e663b
 +        return seedBigInt.toString();
 +    }
 +}
-diff --git a/src/main/java/su/plo/secure/Hashing.java b/src/main/java/su/plo/secure/Hashing.java
+diff --git a/src/main/java/su/plo/matter/Hashing.java b/src/main/java/su/plo/matter/Hashing.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..02fa195e8c7f7d000f25672178dd495a8c28b0b5
+index 0000000000000000000000000000000000000000..d18b15ca0b6585f08b30b019c8c17a0f641c8be0
 --- /dev/null
-+++ b/src/main/java/su/plo/secure/Hashing.java
++++ b/src/main/java/su/plo/matter/Hashing.java
 @@ -0,0 +1,74 @@
-+package su.plo.secure;
++package su.plo.matter;
 +
 +public class Hashing {
 +    // https://en.wikipedia.org/wiki/BLAKE_(hash_function)
@@ -1082,13 +1081,13 @@ index 0000000000000000000000000000000000000000..02fa195e8c7f7d000f25672178dd495a
 +        internalState[posB] = Long.rotateRight(internalState[posB] ^ internalState[posC], 63); // replaces 11 of BLAKE
 +    }
 +}
-diff --git a/src/main/java/su/plo/secure/WorldgenCryptoRandom.java b/src/main/java/su/plo/secure/WorldgenCryptoRandom.java
+diff --git a/src/main/java/su/plo/matter/WorldgenCryptoRandom.java b/src/main/java/su/plo/matter/WorldgenCryptoRandom.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..6963dac2056184790fc3f6ef197d4dfeac00752b
+index 0000000000000000000000000000000000000000..56a1dccabd29543199fb0eca772fd3ad3ef7104a
 --- /dev/null
-+++ b/src/main/java/su/plo/secure/WorldgenCryptoRandom.java
++++ b/src/main/java/su/plo/matter/WorldgenCryptoRandom.java
 @@ -0,0 +1,142 @@
-+package su.plo.secure;
++package su.plo.matter;
 +
 +import net.minecraft.util.Mth;
 +import net.minecraft.world.level.levelgen.LegacyRandomSource;
