@@ -33,12 +33,16 @@ The terrain and biomes stays the same. But all the ores, structures, villages, s
 
 We are also planning to add an ability to change seed for the biome generation. Maybe an ability to change the whole generation, like it was in the original mod. And also make it more customizable. But for now it just works. 
 
+## Download
+
+[Click here to download from Jenkins](https://matter.plo.su/job/Matter-1.18/)
+
 ## How to use
 
 Use it as you would use a Paper server core. You run it and it works. 
 
 It generates a feature seed randomly and stores it in a custom field in the `level.dat` file.
 
-## Download
+## bStats
 
-[Click here to download from Jenkins](https://matter.plo.su/job/Matter-1.18/)
+[![](https://bstats.org/signatures/server-implementation/matter.svg)](https://bstats.org/plugin/server-implementation/Matter/13530)
