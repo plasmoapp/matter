@@ -15,7 +15,11 @@
 
 Matter is a [Paper]() fork that currently only adds what we call a **secure feature seed**. Based on [Secure Seed](https://github.com/Earthcomputer/SecureSeed) mod by Earthcomputer.  
 
+Terrain and biome generation remains the same, but all the ores and structures are generated with 1024-bit seed, instead of the usual 64-bit seed. This seed is almost impossible to crack, and there are no weird links between structures. Like a link between diamonds and clay. 
+
 **Warning:** Developers of this project are absolutely clueless about both server core development and cryptography or whatever. We use it for a production server and didn't run into any major issues, but you should use it only at your own risk. Every claim on this page may be false, and if you run this core, your server may explode. Really, we are not sure, but it can be unstable. 
+
+## Detailed description
 
 Originally it was just a port of Secure Seed. A mod that changes default 64-bit seed to a 1024-bit seed, making it almost impossible to crack the seed. Not only that, there are a lot of things changed related to how random generation works. It's pretty complicated, there are a lot of terms, that we don't understand either. But generally, it means that:
 
