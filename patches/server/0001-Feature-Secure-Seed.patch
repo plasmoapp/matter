@@ -35,7 +35,7 @@ index 5678a9f8d2aa8a7afbc5729570ec297b12acf75d..295ba0dde16850ddd80877e693cd7af2
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
 diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
-index 218f5bafeed8551b55b91c7fccaf6935c8b631ca..baa89acd8afef8966f1be968537b53adcacc5345 100644
+index 218f5bafeed8551b55b91c7fccaf6935c8b631ca..b070ba6f008ecd85dcb994043438113d2ebf379d 100644
 --- a/src/main/java/com/destroystokyo/paper/Metrics.java
 +++ b/src/main/java/com/destroystokyo/paper/Metrics.java
 @@ -593,7 +593,7 @@ public class Metrics {
@@ -47,6 +47,15 @@ index 218f5bafeed8551b55b91c7fccaf6935c8b631ca..baa89acd8afef8966f1be968537b53ad
  
                  metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", () -> {
                      String minecraftVersion = Bukkit.getVersion();
+@@ -603,7 +603,7 @@ public class Metrics {
+ 
+                 metrics.addCustomChart(new Metrics.SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
+                 metrics.addCustomChart(new Metrics.SimplePie("online_mode", () -> Bukkit.getOnlineMode() ? "online" : "offline"));
+-                metrics.addCustomChart(new Metrics.SimplePie("paper_version", () -> (Metrics.class.getPackage().getImplementationVersion() != null) ? Metrics.class.getPackage().getImplementationVersion() : "unknown"));
++                metrics.addCustomChart(new Metrics.SimplePie("matter_version", () -> (Metrics.class.getPackage().getImplementationVersion() != null) ? Metrics.class.getPackage().getImplementationVersion() : "unknown"));
+ 
+                 metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
+                     Map<String, Map<String, Integer>> map = new HashMap<>();
 diff --git a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
 index e0b1f0671d16ddddcb6725acd25a1d1d69e42701..63384b9353e71e9d310528235f1a39d58489ae55 100644
 --- a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
@@ -951,10 +960,10 @@ index 66dc81f3116b10df660fc37c392ce55bde0e2ffe..59e2ece2367e138aec88b8ac09d5b8db
          int j = context.chunkPos().getMinBlockZ() + worldgenRandom.nextInt(16);
          int k = context.chunkGenerator().getSeaLevel();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index ca9282a0e608541837573d155bf9b95a105ba87d..64025cdf312c6c9261e21a8c5a9d3c168764c2b4 100644
+index b4f7b91ac165e3171ffcf7d6a993af248d268959..a8cd2286e32a613ad897464c3e5bfac334248ab4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-@@ -206,7 +206,7 @@ public class CraftChunk implements Chunk {
+@@ -205,7 +205,7 @@ public class CraftChunk implements Chunk {
      @Override
      public boolean isSlimeChunk() {
          // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
