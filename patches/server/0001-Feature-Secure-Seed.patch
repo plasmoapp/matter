@@ -5,7 +5,7 @@ Subject: [PATCH] Feature Secure Seed
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 5678a9f8d2aa8a7afbc5729570ec297b12acf75d..9fb7e9c7c1bdecd68943b6fd1d43fa1801d35a0e 100644
+index 5678a9f8d2aa8a7afbc5729570ec297b12acf75d..295ba0dde16850ddd80877e693cd7af2457663f5 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -18,8 +18,14 @@ repositories {
@@ -25,6 +25,74 @@ index 5678a9f8d2aa8a7afbc5729570ec297b12acf75d..9fb7e9c7c1bdecd68943b6fd1d43fa18
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.21.0")
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
+@@ -67,7 +73,7 @@ tasks.jar {
+         attributes(
+             "Main-Class" to "org.bukkit.craftbukkit.Main",
+             "Implementation-Title" to "CraftBukkit",
+-            "Implementation-Version" to "git-Paper-$implementationVersion",
++            "Implementation-Version" to "git-Matter-$implementationVersion", // Matter
+             "Implementation-Vendor" to date, // Paper
+             "Specification-Title" to "Bukkit",
+             "Specification-Version" to project.version,
+diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
+index ece77f5ea4b14bbed7c070131b3251ea86764538..463ddb1b02ce42d28d5da7332d87cdb69ddb9633 100644
+--- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
++++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
+@@ -31,8 +31,8 @@ public class PaperVersionFetcher implements VersionFetcher {
+     @Nonnull
+     @Override
+     public Component getVersionMessage(@Nonnull String serverVersion) {
+-        String[] parts = serverVersion.substring("git-Paper-".length()).split("[-\\s]");
+-        final Component updateMessage = getUpdateStatusMessage("PaperMC/Paper", GITHUB_BRANCH_NAME, parts[0]);
++        String[] parts = serverVersion.substring("git-Matter-".length()).split("[-\\s]"); // Matter
++        final Component updateMessage = getUpdateStatusMessage("plasmoapp/matter", GITHUB_BRANCH_NAME, parts[0]); // Matter
+         final Component history = getHistory();
+ 
+         return history != null ? TextComponent.ofChildren(updateMessage, Component.newline(), history) : updateMessage;
+@@ -45,7 +45,7 @@ public class PaperVersionFetcher implements VersionFetcher {
+                 String result = matcher.group();
+                 mcVer = result.substring(0, result.length() - 2); // strip 'R' anchor and trailing '-'
+             } else {
+-                org.bukkit.Bukkit.getLogger().warning("Unable to match version to pattern! Report to PaperMC!");
++                org.bukkit.Bukkit.getLogger().warning("Unable to match version to pattern! Report to Matter!"); // Matter
+                 org.bukkit.Bukkit.getLogger().warning("Pattern: " + VER_PATTERN.toString());
+                 org.bukkit.Bukkit.getLogger().warning("Version: " + org.bukkit.Bukkit.getBukkitVersion());
+             }
+@@ -85,7 +85,7 @@ public class PaperVersionFetcher implements VersionFetcher {
+         if (siteApiVersion == null) { return -1; }
+         try {
+             try (BufferedReader reader = Resources.asCharSource(
+-                new URL("https://papermc.io/api/v2/projects/paper/versions/" + siteApiVersion),
++                new URL("https://api.matter.plo.su/versions/" + siteApiVersion), // Matter
+                 Charsets.UTF_8
+             ).openBufferedStream()) {
+                 JsonObject json = new Gson().fromJson(reader, JsonObject.class);
+diff --git a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
+index e0b1f0671d16ddddcb6725acd25a1d1d69e42701..63384b9353e71e9d310528235f1a39d58489ae55 100644
+--- a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
++++ b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
+@@ -17,7 +17,7 @@ public final class PaperConsole extends SimpleTerminalConsole {
+     @Override
+     protected LineReader buildReader(LineReaderBuilder builder) {
+         builder
+-                .appName("Paper")
++                .appName("Matter") // Matter
+                 .variable(LineReader.HISTORY_FILE, java.nio.file.Paths.get(".console_history"))
+                 .completer(new ConsoleCommandCompleter(this.server))
+                 .option(LineReader.Option.COMPLETE_IN_WORD, true);
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 481a5dbad82f3f8dd5b1bf8ab207d82ec73d5bbd..cea84576f966d5d1ba528bcd3e4b43fd7c73aa15 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1709,7 +1709,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+ 
+     @DontObfuscate
+     public String getServerModName() {
+-        return "Paper"; // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
++        return "Matter"; // Matter - Matter >  // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
+     }
+ 
+     public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/net/minecraft/server/commands/SeedCommand.java b/src/main/java/net/minecraft/server/commands/SeedCommand.java
 index 6f4aa3fce42a53883db1485731e03822887cadc0..6d519ce617c99410c32ab2f9cd28fc4e3cb9f6f7 100644
 --- a/src/main/java/net/minecraft/server/commands/SeedCommand.java
@@ -915,6 +983,32 @@ index ca9282a0e608541837573d155bf9b95a105ba87d..64025cdf312c6c9261e21a8c5a9d3c16
      }
  
      @Override
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index d91abf93f2a06f73d3124f4fcff2491fe8d36655..e253d0d0fb45a59178a80001cc445c0e54dbb9bf 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -253,7 +253,7 @@ import javax.annotation.Nullable; // Paper
+ import javax.annotation.Nonnull; // Paper
+ 
+ public final class CraftServer implements Server {
+-    private final String serverName = "Paper"; // Paper
++    private final String serverName = "Matter"; // Paper // Matter
+     private final String serverVersion;
+     private final String bukkitVersion = Versioning.getBukkitVersion();
+     private final Logger logger = Logger.getLogger("Minecraft");
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+index 774556a62eb240da42e84db4502e2ed43495be17..08e87e773c1a38425ade9319ff31b743df7bcae8 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+@@ -11,7 +11,7 @@ public final class Versioning {
+     public static String getBukkitVersion() {
+         String result = "Unknown-Version";
+ 
+-        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/io.papermc.paper/paper-api/pom.properties");
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/su.plo.matter/matter-api/pom.properties");
+         Properties properties = new Properties();
+ 
+         if (stream != null) {
 diff --git a/src/main/java/su/plo/matter/Globals.java b/src/main/java/su/plo/matter/Globals.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..744c6072ee1b6bf87d4d7af6f25650dc81e6a2d1
