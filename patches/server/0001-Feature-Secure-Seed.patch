@@ -34,10 +34,32 @@ index 5678a9f8d2aa8a7afbc5729570ec297b12acf75d..295ba0dde16850ddd80877e693cd7af2
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
+diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
+index 218f5bafeed8551b55b91c7fccaf6935c8b631ca..baa89acd8afef8966f1be968537b53adcacc5345 100644
+--- a/src/main/java/com/destroystokyo/paper/Metrics.java
++++ b/src/main/java/com/destroystokyo/paper/Metrics.java
+@@ -593,7 +593,7 @@ public class Metrics {
+             boolean logFailedRequests = config.getBoolean("logFailedRequests", false);
+             // Only start Metrics, if it's enabled in the config
+             if (config.getBoolean("enabled", true)) {
+-                Metrics metrics = new Metrics("Paper", serverUUID, logFailedRequests, Bukkit.getLogger());
++                Metrics metrics = new Metrics("Matter", serverUUID, logFailedRequests, Bukkit.getLogger()); // Matter
+ 
+                 metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", () -> {
+                     String minecraftVersion = Bukkit.getVersion();
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index ece77f5ea4b14bbed7c070131b3251ea86764538..463ddb1b02ce42d28d5da7332d87cdb69ddb9633 100644
+index ece77f5ea4b14bbed7c070131b3251ea86764538..9d81e84b08ecdfe245f2e3a2853a299ff10c64de 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
+@@ -20,7 +20,7 @@ import java.util.stream.StreamSupport;
+ public class PaperVersionFetcher implements VersionFetcher {
+     private static final java.util.regex.Pattern VER_PATTERN = java.util.regex.Pattern.compile("^([0-9\\.]*)\\-.*R"); // R is an anchor, will always give '-R' at end
+     private static final String GITHUB_BRANCH_NAME = "master";
+-    private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads";
++    private static final String DOWNLOAD_PAGE = "https://matter.plo.su/job/Matter-"; // Matter
+     private static @Nullable String mcVer;
+ 
+     @Override
 @@ -31,8 +31,8 @@ public class PaperVersionFetcher implements VersionFetcher {
      @Nonnull
      @Override
@@ -58,6 +80,15 @@ index ece77f5ea4b14bbed7c070131b3251ea86764538..463ddb1b02ce42d28d5da7332d87cdb6
                  org.bukkit.Bukkit.getLogger().warning("Pattern: " + VER_PATTERN.toString());
                  org.bukkit.Bukkit.getLogger().warning("Version: " + org.bukkit.Bukkit.getBukkitVersion());
              }
+@@ -75,7 +75,7 @@ public class PaperVersionFetcher implements VersionFetcher {
+                 return Component.text("You are " + distance + " version(s) behind", NamedTextColor.YELLOW)
+                         .append(Component.newline())
+                         .append(Component.text("Download the new version at: ")
+-                                .append(Component.text(DOWNLOAD_PAGE, NamedTextColor.GOLD)
++                                .append(Component.text(DOWNLOAD_PAGE + getMinecraftVersion(), NamedTextColor.GOLD) // Matter
+                                         .hoverEvent(Component.text("Click to open", NamedTextColor.WHITE))
+                                         .clickEvent(ClickEvent.openUrl(DOWNLOAD_PAGE))));
+         }
 @@ -85,7 +85,7 @@ public class PaperVersionFetcher implements VersionFetcher {
          if (siteApiVersion == null) { return -1; }
          try {
@@ -996,6 +1027,27 @@ index d91abf93f2a06f73d3124f4fcff2491fe8d36655..e253d0d0fb45a59178a80001cc445c0e
      private final String serverVersion;
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index d51c63496b55d64ac7ee6175bc364012df897891..99f19de8f66818589dd3a6444f917d372faf38e8 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -50,6 +50,7 @@ import org.bukkit.inventory.ItemStack;
+ import org.bukkit.material.MaterialData;
+ import org.bukkit.plugin.InvalidPluginException;
+ import org.bukkit.plugin.PluginDescriptionFile;
++import su.plo.matter.MatterVersionFetcher;
+ 
+ @SuppressWarnings("deprecation")
+ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -394,7 +395,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+ 
+     @Override
+     public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {
+-        return new com.destroystokyo.paper.PaperVersionFetcher();
++        return new MatterVersionFetcher(); // Matter
+     }
+ 
+     @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 index 774556a62eb240da42e84db4502e2ed43495be17..08e87e773c1a38425ade9319ff31b743df7bcae8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
@@ -1176,6 +1228,150 @@ index 0000000000000000000000000000000000000000..d18b15ca0b6585f08b30b019c8c17a0f
 +        internalState[posB] = Long.rotateRight(internalState[posB] ^ internalState[posC], 63); // replaces 11 of BLAKE
 +    }
 +}
+diff --git a/src/main/java/su/plo/matter/MatterVersionFetcher.java b/src/main/java/su/plo/matter/MatterVersionFetcher.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4124b5dd7ee5ed1316c10d3961c9ac9c73eba276
+--- /dev/null
++++ b/src/main/java/su/plo/matter/MatterVersionFetcher.java
+@@ -0,0 +1,137 @@
++package su.plo.matter;
++
++import com.destroystokyo.paper.VersionHistoryManager;
++import com.destroystokyo.paper.util.VersionFetcher;
++import com.google.gson.Gson;
++import com.google.gson.JsonObject;
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.JoinConfiguration;
++import net.kyori.adventure.text.format.NamedTextColor;
++import net.kyori.adventure.text.format.TextDecoration;
++import org.bukkit.craftbukkit.CraftServer;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.io.IOException;
++import java.net.URI;
++import java.net.http.HttpClient;
++import java.net.http.HttpRequest;
++import java.net.http.HttpResponse;
++import java.nio.charset.StandardCharsets;
++import java.util.concurrent.TimeUnit;
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import static net.kyori.adventure.text.Component.text;
++import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
++import static net.kyori.adventure.text.format.NamedTextColor.RED;
++
++public class MatterVersionFetcher implements VersionFetcher {
++    private static final Logger LOGGER = Logger.getLogger("MatterVersionFetcher");
++    private static final HttpClient client = HttpClient.newHttpClient();
++
++    private static final URI JENKINS_URI = URI.create("https://matter.plo.su/job/Matter-1.18/lastSuccessfulBuild/buildNumber");
++    private static final String GITHUB_FORMAT = "https://api.github.com/repos/plasmoapp/matter/compare/ver/master...%s";
++
++    private static final HttpResponse.BodyHandler<JsonObject> JSON_OBJECT_BODY_HANDLER = responseInfo -> HttpResponse.BodySubscribers.mapping(
++            HttpResponse.BodySubscribers.ofString(StandardCharsets.UTF_8),
++            string -> new Gson().fromJson(string, JsonObject.class)
++    );
++
++    @Override
++    public long getCacheTime() {
++        return TimeUnit.MINUTES.toMillis(30);
++    }
++
++    @Override
++    public @NotNull Component getVersionMessage(final @NotNull String serverVersion) {
++        final String[] parts = CraftServer.class.getPackage().getImplementationVersion().split("-");
++        @NotNull Component component;
++
++        if (parts.length != 3) {
++            component = text("Unknown server version.", RED);
++        } else {
++            final String versionString = parts[2];
++
++            try {
++                component = this.fetchJenkinsVersion(Integer.parseInt(versionString));
++            } catch (NumberFormatException e) {
++                component = this.fetchGithubVersion(versionString.substring(1, versionString.length() - 1));
++            }
++        }
++
++        final @Nullable Component history = this.getHistory();
++        return history != null ? Component.join(JoinConfiguration.noSeparators(), component, Component.newline(), this.getHistory()) : component;
++    }
++
++    private @NotNull
++    Component fetchJenkinsVersion(final int versionNumber) {
++        final HttpRequest request = HttpRequest.newBuilder(JENKINS_URI).build();
++        try {
++            final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
++            if (response.statusCode() != 200) {
++                return text("Received invalid status code (" + response.statusCode() + ") from server.", RED);
++            }
++
++            int latestVersionNumber;
++            try {
++                latestVersionNumber = Integer.parseInt(response.body());
++            } catch (NumberFormatException e) {
++                LOGGER.log(Level.WARNING, "Received invalid response from Jenkins \"" + response.body() + "\".");
++                return text("Received invalid response from server.", RED);
++            }
++
++            final int versionDiff = latestVersionNumber - versionNumber;
++            return this.getResponseMessage(versionDiff);
++        } catch (IOException | InterruptedException e) {
++            LOGGER.log(Level.WARNING, "Failed to look up version from Jenkins", e);
++            return text("Failed to retrieve version from server.", RED);
++        }
++    }
++
++    // Based off code contributed by Techcable <Techcable@outlook.com> in Paper/GH-65
++    private @NotNull
++    Component fetchGithubVersion(final @NotNull String hash) {
++        final URI uri = URI.create(String.format(GITHUB_FORMAT, hash));
++        final HttpRequest request = HttpRequest.newBuilder(uri).build();
++        try {
++            final HttpResponse<JsonObject> response = client.send(request, JSON_OBJECT_BODY_HANDLER);
++            if (response.statusCode() != 200) {
++                return text("Received invalid status code (" + response.statusCode() + ") from server.", RED);
++            }
++
++            final JsonObject obj = response.body();
++            final int versionDiff = obj.get("behind_by").getAsInt();
++
++            return this.getResponseMessage(versionDiff);
++        } catch (IOException | InterruptedException e) {
++            LOGGER.log(Level.WARNING, "Failed to look up version from GitHub", e);
++            return text("Failed to retrieve version from server.", RED);
++        }
++    }
++
++    private @NotNull
++    Component getResponseMessage(final int versionDiff) {
++        return switch (Math.max(-1, Math.min(1, versionDiff))) {
++            case -1 -> text("You are running an unsupported version of Matter.", RED);
++            case 0 -> text("You are on the latest version!", GREEN);
++            default -> text("You are running " + versionDiff + " version" + (versionDiff == 1 ? "" : "s") + " beyond. " +
++                    "Please update your server when possible to maintain stability, security, and receive the latest optimizations.", RED);
++        };
++    }
++
++    private @Nullable
++    Component getHistory() {
++        final VersionHistoryManager.VersionData data = VersionHistoryManager.INSTANCE.getVersionData();
++        if (data == null) {
++            return null;
++        }
++
++        final String oldVersion = data.getOldVersion();
++        if (oldVersion == null) {
++            return null;
++        }
++
++        return text("Previous version: " + oldVersion, NamedTextColor.GRAY, TextDecoration.ITALIC);
++    }
++}
+\ No newline at end of file
 diff --git a/src/main/java/su/plo/matter/WorldgenCryptoRandom.java b/src/main/java/su/plo/matter/WorldgenCryptoRandom.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..56a1dccabd29543199fb0eca772fd3ad3ef7104a
