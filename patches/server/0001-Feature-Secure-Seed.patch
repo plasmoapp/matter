@@ -1007,7 +1007,7 @@ index d51c63496b55d64ac7ee6175bc364012df897891..99f19de8f66818589dd3a6444f917d37
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index 774556a62eb240da42e84db4502e2ed43495be17..08e87e773c1a38425ade9319ff31b743df7bcae8 100644
+index 774556a62eb240da42e84db4502e2ed43495be17..524dafef05c7989a896f48a2307ab741eb9c24f8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 @@ -11,7 +11,7 @@ public final class Versioning {
@@ -1015,7 +1015,7 @@ index 774556a62eb240da42e84db4502e2ed43495be17..08e87e773c1a38425ade9319ff31b743
          String result = "Unknown-Version";
  
 -        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/io.papermc.paper/paper-api/pom.properties");
-+        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/su.plo.matter/matter-api/pom.properties");
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/su.plo.matter/Matter-API/pom.properties");
          Properties properties = new Properties();
  
          if (stream != null) {
