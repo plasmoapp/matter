@@ -137,7 +137,7 @@ index 0000000000000000000000000000000000000000..4124b5dd7ee5ed1316c10d3961c9ac9c
 +    private static final Logger LOGGER = Logger.getLogger("MatterVersionFetcher");
 +    private static final HttpClient client = HttpClient.newHttpClient();
 +
-+    private static final URI JENKINS_URI = URI.create("https://matter.plo.su/job/Matter-1.18/lastSuccessfulBuild/buildNumber");
++    private static final URI JENKINS_URI = URI.create("https://matter.plo.su/job/Matter-Purpur-1.18/lastSuccessfulBuild/buildNumber");
 +    private static final String GITHUB_FORMAT = "https://api.github.com/repos/plasmoapp/matter/compare/ver/master...%s";
 +
 +    private static final HttpResponse.BodyHandler<JsonObject> JSON_OBJECT_BODY_HANDLER = responseInfo -> HttpResponse.BodySubscribers.mapping(
