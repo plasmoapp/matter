@@ -101,7 +101,7 @@ index 141a46499eb2cba73a3f71fb50926bc08f37f9f0..5a5897d31c60aab2329a3dc50244b39a
      }
 diff --git a/src/main/java/su/plo/matter/MatterVersionFetcher.java b/src/main/java/su/plo/matter/MatterVersionFetcher.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4124b5dd7ee5ed1316c10d3961c9ac9c73eba276
+index 0000000000000000000000000000000000000000..17fa7aa711f37c312f14c1370562167ec4b2af19
 --- /dev/null
 +++ b/src/main/java/su/plo/matter/MatterVersionFetcher.java
 @@ -0,0 +1,137 @@
@@ -155,7 +155,7 @@ index 0000000000000000000000000000000000000000..4124b5dd7ee5ed1316c10d3961c9ac9c
 +        final String[] parts = CraftServer.class.getPackage().getImplementationVersion().split("-");
 +        @NotNull Component component;
 +
-+        if (parts.length != 3) {
++        if (parts.length != 4) {
 +            component = text("Unknown server version.", RED);
 +        } else {
 +            final String versionString = parts[2];
