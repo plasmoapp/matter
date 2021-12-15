@@ -1,0 +1,245 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Apehum <apehumchik@gmail.com>
+Date: Thu, 16 Dec 2021 00:16:49 +0800
+Subject: [PATCH] Matter Branding
+
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index e5cba810a2f207d7bb57d946573acbee1e8013c7..f2015b6639f01d15f2ed2a049466d8a792c4897d 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -19,7 +19,7 @@ repositories {
+ 
+ dependencies {
+     // Purpur start
+-    implementation(project(":purpur-api"))
++    implementation(project(":matter-purpur-api")) // Matter
+     implementation("io.papermc.paper:paper-mojangapi:1.18-R0.1-SNAPSHOT") {
+         exclude("io.papermc.paper", "paper-api")
+     }
+@@ -74,7 +74,7 @@ tasks.jar {
+         attributes(
+             "Main-Class" to "org.bukkit.craftbukkit.Main",
+             "Implementation-Title" to "CraftBukkit",
+-            "Implementation-Version" to "git-Purpur-$implementationVersion", // Purpur
++            "Implementation-Version" to "git-Matter-Purpur-$implementationVersion", // Purpur // Matter
+             "Implementation-Vendor" to date, // Paper
+             "Specification-Title" to "Bukkit",
+             "Specification-Version" to project.version,
+diff --git a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
+index 8c3c68465197fafc14849dc38a572e309931e2a2..a6d857b907ecc261a7684a1446b735b9b2256cf4 100644
+--- a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
++++ b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
+@@ -17,7 +17,7 @@ public final class PaperConsole extends SimpleTerminalConsole {
+     @Override
+     protected LineReader buildReader(LineReaderBuilder builder) {
+         builder
+-                .appName("Purpur") // Purpur
++                .appName("Matter-Purpur") // Purpur // Matter
+                 .variable(LineReader.HISTORY_FILE, java.nio.file.Paths.get(".console_history"))
+                 .completer(new ConsoleCommandCompleter(this.server))
+                 .option(LineReader.Option.COMPLETE_IN_WORD, true);
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 959cb69b37921c62a9012642acaf2d0295915e1f..f4a90865d62390fcda71f2339aa49b5d98a6a284 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -253,7 +253,7 @@ import javax.annotation.Nullable; // Paper
+ import javax.annotation.Nonnull; // Paper
+ 
+ public final class CraftServer implements Server {
+-    private final String serverName = "Purpur"; // Paper // Purpur
++    private final String serverName = "Matter-Purpur"; // Paper // Purpur // Matter
+     private final String serverVersion;
+     private final String bukkitVersion = Versioning.getBukkitVersion();
+     private final Logger logger = Logger.getLogger("Minecraft");
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index 90e68a8cfd00e4ad7ffaddfc8e8d5df26c49cf7a..248b62685a263a2e6d3feeaa002afcc24dee9ac2 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -50,6 +50,7 @@ import org.bukkit.inventory.ItemStack;
+ import org.bukkit.material.MaterialData;
+ import org.bukkit.plugin.InvalidPluginException;
+ import org.bukkit.plugin.PluginDescriptionFile;
++import su.plo.matter.MatterVersionFetcher;
+ 
+ @SuppressWarnings("deprecation")
+ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -394,7 +395,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+ 
+     @Override
+     public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {
+-        return new com.destroystokyo.paper.PaperVersionFetcher();
++        return new MatterVersionFetcher(); // Matter
+     }
+ 
+     @Override
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+index fb87620c742ff7912f5e8ccd2a7930dd605576d9..350fcb92af9068a6b059684d80a441be7160985c 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+@@ -11,7 +11,7 @@ public final class Versioning {
+     public static String getBukkitVersion() {
+         String result = "Unknown-Version";
+ 
+-        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/org.purpurmc.purpur/purpur-api/pom.properties"); // Purpur
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/su.plo.matter/matter-purpur-api/pom.properties"); // Purpur // Matter
+         Properties properties = new Properties();
+ 
+         if (stream != null) {
+diff --git a/src/main/java/org/purpurmc/purpur/PurpurConfig.java b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
+index 141a46499eb2cba73a3f71fb50926bc08f37f9f0..5a5897d31c60aab2329a3dc50244b39a0fb962d9 100644
+--- a/src/main/java/org/purpurmc/purpur/PurpurConfig.java
++++ b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
+@@ -209,7 +209,7 @@ public class PurpurConfig {
+         if (!TimingsManager.hiddenConfigs.contains("settings.seed")) TimingsManager.hiddenConfigs.add("settings.seed");
+     }
+ 
+-    public static String serverModName = "Purpur";
++    public static String serverModName = "Matter-Purpur"; // Matter
+     private static void serverModName() {
+         serverModName = getString("settings.server-mod-name", serverModName);
+     }
+diff --git a/src/main/java/su/plo/matter/MatterVersionFetcher.java b/src/main/java/su/plo/matter/MatterVersionFetcher.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4124b5dd7ee5ed1316c10d3961c9ac9c73eba276
+--- /dev/null
++++ b/src/main/java/su/plo/matter/MatterVersionFetcher.java
+@@ -0,0 +1,137 @@
++package su.plo.matter;
++
++import com.destroystokyo.paper.VersionHistoryManager;
++import com.destroystokyo.paper.util.VersionFetcher;
++import com.google.gson.Gson;
++import com.google.gson.JsonObject;
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.JoinConfiguration;
++import net.kyori.adventure.text.format.NamedTextColor;
++import net.kyori.adventure.text.format.TextDecoration;
++import org.bukkit.craftbukkit.CraftServer;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.io.IOException;
++import java.net.URI;
++import java.net.http.HttpClient;
++import java.net.http.HttpRequest;
++import java.net.http.HttpResponse;
++import java.nio.charset.StandardCharsets;
++import java.util.concurrent.TimeUnit;
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import static net.kyori.adventure.text.Component.text;
++import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
++import static net.kyori.adventure.text.format.NamedTextColor.RED;
++
++public class MatterVersionFetcher implements VersionFetcher {
++    private static final Logger LOGGER = Logger.getLogger("MatterVersionFetcher");
++    private static final HttpClient client = HttpClient.newHttpClient();
++
++    private static final URI JENKINS_URI = URI.create("https://matter.plo.su/job/Matter-1.18/lastSuccessfulBuild/buildNumber");
++    private static final String GITHUB_FORMAT = "https://api.github.com/repos/plasmoapp/matter/compare/ver/master...%s";
++
++    private static final HttpResponse.BodyHandler<JsonObject> JSON_OBJECT_BODY_HANDLER = responseInfo -> HttpResponse.BodySubscribers.mapping(
++            HttpResponse.BodySubscribers.ofString(StandardCharsets.UTF_8),
++            string -> new Gson().fromJson(string, JsonObject.class)
++    );
++
++    @Override
++    public long getCacheTime() {
++        return TimeUnit.MINUTES.toMillis(30);
++    }
++
++    @Override
++    public @NotNull Component getVersionMessage(final @NotNull String serverVersion) {
++        final String[] parts = CraftServer.class.getPackage().getImplementationVersion().split("-");
++        @NotNull Component component;
++
++        if (parts.length != 3) {
++            component = text("Unknown server version.", RED);
++        } else {
++            final String versionString = parts[2];
++
++            try {
++                component = this.fetchJenkinsVersion(Integer.parseInt(versionString));
++            } catch (NumberFormatException e) {
++                component = this.fetchGithubVersion(versionString.substring(1, versionString.length() - 1));
++            }
++        }
++
++        final @Nullable Component history = this.getHistory();
++        return history != null ? Component.join(JoinConfiguration.noSeparators(), component, Component.newline(), this.getHistory()) : component;
++    }
++
++    private @NotNull
++    Component fetchJenkinsVersion(final int versionNumber) {
++        final HttpRequest request = HttpRequest.newBuilder(JENKINS_URI).build();
++        try {
++            final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
++            if (response.statusCode() != 200) {
++                return text("Received invalid status code (" + response.statusCode() + ") from server.", RED);
++            }
++
++            int latestVersionNumber;
++            try {
++                latestVersionNumber = Integer.parseInt(response.body());
++            } catch (NumberFormatException e) {
++                LOGGER.log(Level.WARNING, "Received invalid response from Jenkins \"" + response.body() + "\".");
++                return text("Received invalid response from server.", RED);
++            }
++
++            final int versionDiff = latestVersionNumber - versionNumber;
++            return this.getResponseMessage(versionDiff);
++        } catch (IOException | InterruptedException e) {
++            LOGGER.log(Level.WARNING, "Failed to look up version from Jenkins", e);
++            return text("Failed to retrieve version from server.", RED);
++        }
++    }
++
++    // Based off code contributed by Techcable <Techcable@outlook.com> in Paper/GH-65
++    private @NotNull
++    Component fetchGithubVersion(final @NotNull String hash) {
++        final URI uri = URI.create(String.format(GITHUB_FORMAT, hash));
++        final HttpRequest request = HttpRequest.newBuilder(uri).build();
++        try {
++            final HttpResponse<JsonObject> response = client.send(request, JSON_OBJECT_BODY_HANDLER);
++            if (response.statusCode() != 200) {
++                return text("Received invalid status code (" + response.statusCode() + ") from server.", RED);
++            }
++
++            final JsonObject obj = response.body();
++            final int versionDiff = obj.get("behind_by").getAsInt();
++
++            return this.getResponseMessage(versionDiff);
++        } catch (IOException | InterruptedException e) {
++            LOGGER.log(Level.WARNING, "Failed to look up version from GitHub", e);
++            return text("Failed to retrieve version from server.", RED);
++        }
++    }
++
++    private @NotNull
++    Component getResponseMessage(final int versionDiff) {
++        return switch (Math.max(-1, Math.min(1, versionDiff))) {
++            case -1 -> text("You are running an unsupported version of Matter.", RED);
++            case 0 -> text("You are on the latest version!", GREEN);
++            default -> text("You are running " + versionDiff + " version" + (versionDiff == 1 ? "" : "s") + " beyond. " +
++                    "Please update your server when possible to maintain stability, security, and receive the latest optimizations.", RED);
++        };
++    }
++
++    private @Nullable
++    Component getHistory() {
++        final VersionHistoryManager.VersionData data = VersionHistoryManager.INSTANCE.getVersionData();
++        if (data == null) {
++            return null;
++        }
++
++        final String oldVersion = data.getOldVersion();
++        if (oldVersion == null) {
++            return null;
++        }
++
++        return text("Previous version: " + oldVersion, NamedTextColor.GRAY, TextDecoration.ITALIC);
++    }
++}
+\ No newline at end of file
