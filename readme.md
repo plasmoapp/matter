@@ -13,7 +13,7 @@
 
 # Matter
 
-Matter is a [Paper]() fork that currently only adds what we call a **secure feature seed**. Based on [Secure Seed](https://github.com/Earthcomputer/SecureSeed) mod by Earthcomputer.  
+Matter is a [Purpur](https://github.com/PurpurMC/Purpur) fork that currently only adds what we call a **secure feature seed**. Based on [Secure Seed](https://github.com/Earthcomputer/SecureSeed) mod by Earthcomputer.
 
 Terrain and biome generation remains the same, but all the ores and structures are generated with 1024-bit seed, instead of the usual 64-bit seed. This seed is almost impossible to crack, and there are no weird links between structures. Like a link between diamonds and clay. 
 
