@@ -93,7 +93,7 @@ index 80553face9c70c2a3d897681e7761df85b22d464..c4831e424782b83ae81b4b948ff52c25
          if (stream != null) {
 diff --git a/src/main/java/su/plo/matter/MatterVersionFetcher.java b/src/main/java/su/plo/matter/MatterVersionFetcher.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4124b5dd7ee5ed1316c10d3961c9ac9c73eba276
+index 0000000000000000000000000000000000000000..3de5c2def719c799a2f497e43e18359ff50ff948
 --- /dev/null
 +++ b/src/main/java/su/plo/matter/MatterVersionFetcher.java
 @@ -0,0 +1,137 @@
@@ -130,7 +130,7 @@ index 0000000000000000000000000000000000000000..4124b5dd7ee5ed1316c10d3961c9ac9c
 +    private static final HttpClient client = HttpClient.newHttpClient();
 +
 +    private static final URI JENKINS_URI = URI.create("https://matter.plo.su/job/Matter-1.18/lastSuccessfulBuild/buildNumber");
-+    private static final String GITHUB_FORMAT = "https://api.github.com/repos/plasmoapp/matter/compare/ver/master...%s";
++    private static final String GITHUB_FORMAT = "https://api.github.com/repos/plasmoapp/matter/compare/ver/pufferfish-1.18...%s";
 +
 +    private static final HttpResponse.BodyHandler<JsonObject> JSON_OBJECT_BODY_HANDLER = responseInfo -> HttpResponse.BodySubscribers.mapping(
 +            HttpResponse.BodySubscribers.ofString(StandardCharsets.UTF_8),
