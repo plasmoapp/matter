@@ -5,7 +5,7 @@ Subject: [PATCH] Feature Secure Seed
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index e7e110b53e79e0606262982555dd9eb096c7c4a8..bb7e77e22b58250b687d9df429a982ca038c9aa7 100644
+index 406bfe20a7b8786bbc6bee46151be91dadec6180..fc5bc5df405d2d798b657e3432e80e5ff0cc3f77 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -49,6 +49,8 @@ import net.minecraft.world.level.storage.LevelStorageSource;
@@ -17,7 +17,7 @@ index e7e110b53e79e0606262982555dd9eb096c7c4a8..bb7e77e22b58250b687d9df429a982ca
  import java.util.function.Function; // Paper
  
  public class ServerChunkCache extends ChunkSource {
-@@ -1111,6 +1113,8 @@ public class ServerChunkCache extends ChunkSource {
+@@ -1146,6 +1148,8 @@ public class ServerChunkCache extends ChunkSource {
      }
  
      public ChunkGenerator getGenerator() {
@@ -27,10 +27,10 @@ index e7e110b53e79e0606262982555dd9eb096c7c4a8..bb7e77e22b58250b687d9df429a982ca
      }
  
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Slime.java b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-index d49ba154d173aa7bf5a679b7bfcc55de851ea34b..c077fced547ea2c8bb9826ca353208961f020e7d 100644
+index 5722d9b30223fb229b80f54d7fb9edf41254a7f7..f0dc9c709659293d5e7b78a5e8f4fa6c5c980a5f 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Slime.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-@@ -397,7 +397,7 @@ public class Slime extends Mob implements Enemy {
+@@ -336,7 +336,7 @@ public class Slime extends Mob implements Enemy {
              }
  
              ChunkPos chunkcoordintpair = new ChunkPos(pos);
@@ -96,7 +96,7 @@ index 5aeaaae6f15050a2da271fe196d0a234ecafc8a1..ea720517a1adfb164d540c2743aaec2a
          for (int i = 0; i < sectionArray.length; ++i) {
              if (sectionArray[i] == null) {
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
-index fe0f14b363f4e6b583cd079f2cf627605731f764..11519b8cdfa20839a8aa76cbb3e6cd4fe473fcdc 100644
+index e4591c0b3c8547cc6f4e2a0891fc378ee4334d9e..d05d67240a368e3a7352fe59a5803893f5bd6eba 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 @@ -68,6 +68,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;

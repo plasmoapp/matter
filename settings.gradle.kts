@@ -8,4 +8,4 @@ pluginManagement {
 
 rootProject.name = "Matter"
 
-include("matter-purpur-api", "matter-purpur-server")
+include("matter-api", "matter-server")

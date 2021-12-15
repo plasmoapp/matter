@@ -38,24 +38,24 @@ subprojects {
 }
 
 paperweight {
-    serverProject.set(project(":matter-purpur-server"))
+    serverProject.set(project(":matter-server"))
 
     remapRepo.set("https://maven.fabricmc.net/")
     decompileRepo.set("https://files.minecraftforge.net/maven/")
 
-    useStandardUpstream("purpur") {
-        url.set(github("PurpurMC", "Purpur"))
-        ref.set(providers.gradleProperty("purpurRef"))
+    useStandardUpstream("pufferfish") {
+        url.set(github("pufferfish-gg", "Pufferfish"))
+        ref.set(providers.gradleProperty("pufferfishRef"))
 
         withStandardPatcher {
-            apiSourceDirPath.set("Purpur-API")
-            serverSourceDirPath.set("Purpur-Server")
+            apiSourceDirPath.set("pufferfish-api")
+            serverSourceDirPath.set("pufferfish-server")
 
             apiPatchDir.set(layout.projectDirectory.dir("patches/api"))
             serverPatchDir.set(layout.projectDirectory.dir("patches/server"))
 
-            apiOutputDir.set(layout.projectDirectory.dir("matter-purpur-api"))
-            serverOutputDir.set(layout.projectDirectory.dir("matter-purpur-server"))
+            apiOutputDir.set(layout.projectDirectory.dir("matter-api"))
+            serverOutputDir.set(layout.projectDirectory.dir("matter-server"))
         }
     }
 }
