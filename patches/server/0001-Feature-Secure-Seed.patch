@@ -27,10 +27,10 @@ index e7e110b53e79e0606262982555dd9eb096c7c4a8..bb7e77e22b58250b687d9df429a982ca
      }
  
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Slime.java b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-index d49ba154d173aa7bf5a679b7bfcc55de851ea34b..c077fced547ea2c8bb9826ca353208961f020e7d 100644
+index 641d6e58a1b84c7abc4b9e6c76c35cbe51aeba4d..8d500c4449b95cd5aacbf30ffd7363dabae8a555 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Slime.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-@@ -397,7 +397,7 @@ public class Slime extends Mob implements Enemy {
+@@ -402,7 +402,7 @@ public class Slime extends Mob implements Enemy {
              }
  
              ChunkPos chunkcoordintpair = new ChunkPos(pos);
@@ -96,7 +96,7 @@ index 5aeaaae6f15050a2da271fe196d0a234ecafc8a1..ea720517a1adfb164d540c2743aaec2a
          for (int i = 0; i < sectionArray.length; ++i) {
              if (sectionArray[i] == null) {
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
-index fe0f14b363f4e6b583cd079f2cf627605731f764..11519b8cdfa20839a8aa76cbb3e6cd4fe473fcdc 100644
+index b2c93ce627cf0a50b4b0a60d2d4206e6c6904e0a..75b7f4dd16eb6b61169e9c5c026f127bfa8e6db8 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 @@ -68,6 +68,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -108,7 +108,7 @@ index fe0f14b363f4e6b583cd079f2cf627605731f764..11519b8cdfa20839a8aa76cbb3e6cd4f
  
  public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
  
-@@ -109,9 +111,9 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
+@@ -112,9 +114,9 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
                  int i = structuresettingsstronghold.distance();
                  int j = structuresettingsstronghold.count();
                  int k = structuresettingsstronghold.spread();
@@ -120,7 +120,7 @@ index fe0f14b363f4e6b583cd079f2cf627605731f764..11519b8cdfa20839a8aa76cbb3e6cd4f
                  double d0 = random.nextDouble() * 3.141592653589793D * 2.0D;
                  int l = 0;
                  int i1 = 0;
-@@ -250,8 +252,12 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
+@@ -253,8 +255,12 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
                  return structuregenerator.step().ordinal();
              }));
              List<BiomeSource.StepFeatureData> list = this.biomeSource.featuresPerStep();
@@ -395,7 +395,7 @@ index 61fc0485c4896b62f74b92c3b4b93f22cbfb3ed7..1b41d187e44217d533835dac3cb79e2d
      }
  }
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java
-index c4ec2e41314da9501dc62baa024607b2782d2c73..01e44d84a8bddb98a2463028c6ea992db89b7cc8 100644
+index 54341db6faf66c8e84156ee3a310fd0d6561b632..01e44d84a8bddb98a2463028c6ea992db89b7cc8 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java
 @@ -4,13 +4,14 @@ import com.mojang.serialization.Codec;
@@ -414,12 +414,15 @@ index c4ec2e41314da9501dc62baa024607b2782d2c73..01e44d84a8bddb98a2463028c6ea992d
  
  public class BuriedTreasureFeature extends StructureFeature<ProbabilityFeatureConfiguration> {
      private static final int RANDOM_SALT = 10387320;
-@@ -20,8 +21,11 @@ public class BuriedTreasureFeature extends StructureFeature<ProbabilityFeatureCo
+@@ -20,11 +21,11 @@ public class BuriedTreasureFeature extends StructureFeature<ProbabilityFeatureCo
      }
  
      private static boolean checkLocation(PieceGeneratorSupplier.Context<ProbabilityFeatureConfiguration> context) {
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setLargeFeatureWithSalt(context.seed(), context.chunkPos().x, context.chunkPos().z, 10387320);
+-        // Purpur start
+-        int salt = org.purpurmc.purpur.PurpurConfig.seedStructureBuriedTreasure;
+-        worldgenRandom.setLargeFeatureWithSalt(context.seed(), context.chunkPos().x, context.chunkPos().z, salt != -1 ? salt : RANDOM_SALT);
+-        // Purpur end
 +        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
 +                context.chunkPos().x, context.chunkPos().z, Globals.Salt.BURIED_TREASURE_FEATURE, 0
@@ -452,7 +455,7 @@ index 24110d4d412b5bd0a6c17215b889ea6c02558a2c..afb23e32ed7ec4f389be09afdce758b3
          List<BlockPos> list2 = Lists.newLinkedList();
          double d = (double)k / (double)geodeConfiguration.outerWallDistance.getMaxValue();
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java
-index 45f11284bf65081b3b2e8da85114efbe5efd5b42..6f9bd5820acf6185fdef57c6b446c1c4c2e8cb05 100644
+index 354a923350cbfc76645136858e8e96285de139a1..6f9bd5820acf6185fdef57c6b446c1c4c2e8cb05 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java
 @@ -1,9 +1,6 @@
@@ -485,11 +488,15 @@ index 45f11284bf65081b3b2e8da85114efbe5efd5b42..6f9bd5820acf6185fdef57c6b446c1c4
  
  public class MineshaftFeature extends StructureFeature<MineshaftConfiguration> {
      public MineshaftFeature(Codec<MineshaftConfiguration> configCodec) {
-@@ -26,8 +28,11 @@ public class MineshaftFeature extends StructureFeature<MineshaftConfiguration> {
+@@ -26,12 +28,11 @@ public class MineshaftFeature extends StructureFeature<MineshaftConfiguration> {
      }
  
      private static boolean checkLocation(PieceGeneratorSupplier.Context<MineshaftConfiguration> context) {
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
+-        // Purpur start
+-        int salt = org.purpurmc.purpur.PurpurConfig.seedStructureMineshaft;
+-        if (salt != -1) worldgenRandom.setLargeFeatureWithSalt(context.seed(), context.chunkPos().x, context.chunkPos().z, salt); else
+-        // Purpur end
 -        worldgenRandom.setLargeFeatureSeed(context.seed(), context.chunkPos().x, context.chunkPos().z);
 +        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
@@ -849,14 +856,14 @@ index 66dc81f3116b10df660fc37c392ce55bde0e2ffe..59e2ece2367e138aec88b8ac09d5b8db
          int j = context.chunkPos().getMinBlockZ() + worldgenRandom.nextInt(16);
          int k = context.chunkGenerator().getSeaLevel();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index d51476ca2aad08a0dd93a2e772dd7750afc939dc..b33d3e8be3aa95b83a7ce6f8f04d773380637038 100644
+index f20293426b104ed0c02a931b5ab77f87590f0c18..b33d3e8be3aa95b83a7ce6f8f04d773380637038 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 @@ -205,7 +205,7 @@ public class CraftChunk implements Chunk {
      @Override
      public boolean isSlimeChunk() {
          // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
--        return WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0;
+-        return this.worldServer.paperConfig.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
 +        return worldServer.getChunk(this.getX(), this.getZ()).isSlimeChunk(); // Matter
      }
  

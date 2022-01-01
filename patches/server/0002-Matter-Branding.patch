@@ -5,7 +5,7 @@ Subject: [PATCH] Matter Branding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 27231e99bb03af8e7471e69dfcbfd2ae32d90703..69d18b275e16772a30384721188f531b5a27154f 100644
+index e37f6b06554b8db8630bbb6a4483da8eb7fca7b6..0c0d8cf329c00dffc7fda4f0eacf963d5c529933 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -19,7 +19,7 @@ repositories {
@@ -40,10 +40,10 @@ index 8c3c68465197fafc14849dc38a572e309931e2a2..a6d857b907ecc261a7684a1446b735b9
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 959cb69b37921c62a9012642acaf2d0295915e1f..f4a90865d62390fcda71f2339aa49b5d98a6a284 100644
+index 1b7a3180ff88b0db2aab6e61b286f9b4d0da6862..d93880f4ce893efbfeaa2d47779d016bd182353f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -253,7 +253,7 @@ import javax.annotation.Nullable; // Paper
+@@ -254,7 +254,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
@@ -53,7 +53,7 @@ index 959cb69b37921c62a9012642acaf2d0295915e1f..f4a90865d62390fcda71f2339aa49b5d
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 90e68a8cfd00e4ad7ffaddfc8e8d5df26c49cf7a..248b62685a263a2e6d3feeaa002afcc24dee9ac2 100644
+index 9679b17b19e208c82570e1769efb18e23b5b3778..de5ff94aea7e5727f07affd59bc3948ddec672a8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -50,6 +50,7 @@ import org.bukkit.inventory.ItemStack;
@@ -64,7 +64,7 @@ index 90e68a8cfd00e4ad7ffaddfc8e8d5df26c49cf7a..248b62685a263a2e6d3feeaa002afcc2
  
  @SuppressWarnings("deprecation")
  public final class CraftMagicNumbers implements UnsafeValues {
-@@ -394,7 +395,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -399,7 +400,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      @Override
      public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {
