@@ -849,14 +849,14 @@ index 66dc81f3116b10df660fc37c392ce55bde0e2ffe..59e2ece2367e138aec88b8ac09d5b8db
          int j = context.chunkPos().getMinBlockZ() + worldgenRandom.nextInt(16);
          int k = context.chunkGenerator().getSeaLevel();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index d51476ca2aad08a0dd93a2e772dd7750afc939dc..b33d3e8be3aa95b83a7ce6f8f04d773380637038 100644
+index f20293426b104ed0c02a931b5ab77f87590f0c18..b33d3e8be3aa95b83a7ce6f8f04d773380637038 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 @@ -205,7 +205,7 @@ public class CraftChunk implements Chunk {
      @Override
      public boolean isSlimeChunk() {
          // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
--        return WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0;
+-        return this.worldServer.paperConfig.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
 +        return worldServer.getChunk(this.getX(), this.getZ()).isSlimeChunk(); // Matter
      }
  
