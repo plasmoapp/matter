@@ -5,7 +5,7 @@ Subject: [PATCH] Feature Secure Seed
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 406bfe20a7b8786bbc6bee46151be91dadec6180..fc5bc5df405d2d798b657e3432e80e5ff0cc3f77 100644
+index 587855dcd2eb40f89c2a2282c202e9fbef2c7382..cf0cd235511ee099f550c823f5ef0be269c488d8 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -49,6 +49,8 @@ import net.minecraft.world.level.storage.LevelStorageSource;
@@ -17,7 +17,7 @@ index 406bfe20a7b8786bbc6bee46151be91dadec6180..fc5bc5df405d2d798b657e3432e80e5f
  import java.util.function.Function; // Paper
  
  public class ServerChunkCache extends ChunkSource {
-@@ -1146,6 +1148,8 @@ public class ServerChunkCache extends ChunkSource {
+@@ -1142,6 +1144,8 @@ public class ServerChunkCache extends ChunkSource {
      }
  
      public ChunkGenerator getGenerator() {
