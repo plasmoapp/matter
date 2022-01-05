@@ -364,7 +364,7 @@ index 286c75989282c6d370ca64ac714ab15d784210ab..085b498cd764e853f303f95155aaefe2
  
          return generatorsettings;
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
-index 61fc0485c4896b62f74b92c3b4b93f22cbfb3ed7..1b41d187e44217d533835dac3cb79e2d5f29fd7e 100644
+index 61fc0485c4896b62f74b92c3b4b93f22cbfb3ed7..c3bd1ccb83d2c5a02c265c38dee237eb902193c1 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
 @@ -1,10 +1,11 @@
@@ -388,7 +388,7 @@ index 61fc0485c4896b62f74b92c3b4b93f22cbfb3ed7..1b41d187e44217d533835dac3cb79e2d
 -        worldgenRandom.setLargeFeatureSeed(context.seed(), context.chunkPos().x, context.chunkPos().z);
 +        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                context.chunkPos().x, context.chunkPos().z, Globals.Salt.BASTION_FEATURE, 0
++                context.chunkPos().x, context.chunkPos().z, Globals.Salt.NETHER_FORTRESS_FEATURE, 0
 +        );
 +        // Matter end
          return worldgenRandom.nextInt(5) >= 2;
