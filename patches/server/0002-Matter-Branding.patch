@@ -5,23 +5,24 @@ Subject: [PATCH] Matter Branding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index e37f6b06554b8db8630bbb6a4483da8eb7fca7b6..0c0d8cf329c00dffc7fda4f0eacf963d5c529933 100644
+index 1bdcca4d1a25f4292ab9421d44fa3018af263341..b04f379a374b16226199d84fc45da4aeec80df26 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -19,7 +19,7 @@ repositories {
+@@ -18,8 +18,7 @@ repositories {
+ }
  
  dependencies {
-     // Purpur start
--    implementation(project(":purpur-api"))
+-    implementation(project(":purpur-api")) // Pufferfish // Paper // Purpur
+-    // Pufferfish start
 +    implementation(project(":matter-purpur-api")) // Matter
      implementation("io.papermc.paper:paper-mojangapi:1.18.1-R0.1-SNAPSHOT") {
          exclude("io.papermc.paper", "paper-api")
      }
-@@ -74,7 +74,7 @@ tasks.jar {
+@@ -82,7 +81,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
--            "Implementation-Version" to "git-Purpur-$implementationVersion", // Purpur
+-            "Implementation-Version" to "git-Purpur-$implementationVersion", // Pufferfish // Purpur
 +            "Implementation-Version" to "git-Matter-Purpur-$implementationVersion", // Purpur // Matter
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
@@ -40,23 +41,26 @@ index 8c3c68465197fafc14849dc38a572e309931e2a2..a6d857b907ecc261a7684a1446b735b9
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 1b7a3180ff88b0db2aab6e61b286f9b4d0da6862..d93880f4ce893efbfeaa2d47779d016bd182353f 100644
+index 9b474cebe9999068384e810b5f14d6b3a049a564..dfd123135720fe8c89f54cec04c560b4309c295b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -254,7 +254,7 @@ import javax.annotation.Nullable; // Paper
+@@ -254,7 +254,11 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
--    private final String serverName = "Purpur"; // Paper // Purpur
++<<<<<<< HEAD
+     private final String serverName = "Purpur"; // Paper // Pufferfish // Purpur
++=======
 +    private final String serverName = "Matter-Purpur"; // Paper // Purpur // Matter
++>>>>>>> Matter Branding
      private final String serverVersion;
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 9679b17b19e208c82570e1769efb18e23b5b3778..de5ff94aea7e5727f07affd59bc3948ddec672a8 100644
+index 5687dbbb3f1df46a453841c24a343773c801bf73..c7b3af34952d5b7ec6c5937bf92409fd96af5272 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -50,6 +50,7 @@ import org.bukkit.inventory.ItemStack;
+@@ -59,6 +59,7 @@ import org.bukkit.inventory.ItemStack;
  import org.bukkit.material.MaterialData;
  import org.bukkit.plugin.InvalidPluginException;
  import org.bukkit.plugin.PluginDescriptionFile;
@@ -64,33 +68,39 @@ index 9679b17b19e208c82570e1769efb18e23b5b3778..de5ff94aea7e5727f07affd59bc3948d
  
  @SuppressWarnings("deprecation")
  public final class CraftMagicNumbers implements UnsafeValues {
-@@ -399,7 +400,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -421,7 +422,11 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      @Override
      public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {
--        return new com.destroystokyo.paper.PaperVersionFetcher();
++<<<<<<< HEAD
+         return new com.destroystokyo.paper.PaperVersionFetcher(); // Pufferfish // Purpur
++=======
 +        return new MatterVersionFetcher(); // Matter
++>>>>>>> Matter Branding
      }
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index fb87620c742ff7912f5e8ccd2a7930dd605576d9..350fcb92af9068a6b059684d80a441be7160985c 100644
+index 99597258e8e88cd9e2c901c4ac3ff7faeeabee2b..da7add52d4c949c6bbce468df5b3ad66d006e39c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-@@ -11,7 +11,7 @@ public final class Versioning {
+@@ -11,7 +11,11 @@ public final class Versioning {
      public static String getBukkitVersion() {
          String result = "Unknown-Version";
  
--        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/org.purpurmc.purpur/purpur-api/pom.properties"); // Purpur
++<<<<<<< HEAD
+         InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/org.purpurmc.purpur/purpur-api/pom.properties"); // Pufferfish // Purpur
++=======
 +        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/su.plo.matter/matter-purpur-api/pom.properties"); // Purpur // Matter
++>>>>>>> Matter Branding
          Properties properties = new Properties();
  
          if (stream != null) {
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurConfig.java b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
-index 5c9973374991446c39d6a84d745283eac3eb70ab..984172dbab9f957acc85ad1d7dc6d01fb1249f7b 100644
+index f19e6c9af8cd559ba5a1492b0d579bf6182f342a..4cccf761245cdaf956f85dceaab609e00908b539 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
-@@ -209,7 +209,7 @@ public class PurpurConfig {
+@@ -216,7 +216,7 @@ public class PurpurConfig {
          if (!TimingsManager.hiddenConfigs.contains("settings.seed")) TimingsManager.hiddenConfigs.add("settings.seed");
      }
  

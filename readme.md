@@ -35,7 +35,7 @@ We are also planning to add an ability to change seed for the biome generation. 
 
 ## Download
 
-[Click here to download from Jenkins](https://matter.plo.su/job/Matter-1.18/)
+[Click here to download from Jenkins](https://matter.plo.su/job/Matter-Purpur-1.18/)
 
 ## How to use
 
