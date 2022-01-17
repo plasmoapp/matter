@@ -27,18 +27,18 @@ index f51fcaba69c9ddc27130ab615526e05b1b4f0e07..1ab2bf2e1b0c77b4b8813da91f614d1c
      }
  
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Slime.java b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-index 641d6e58a1b84c7abc4b9e6c76c35cbe51aeba4d..8d500c4449b95cd5aacbf30ffd7363dabae8a555 100644
+index e90d32cf1e6b4045c1afb1e3fc599f0eb9ee0a84..a1497d294f0ddce0d7d4368f82f5180ff360af02 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Slime.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-@@ -402,7 +402,7 @@ public class Slime extends Mob implements Enemy {
+@@ -406,7 +406,7 @@ public class Slime extends Mob implements Enemy {
              }
  
              ChunkPos chunkcoordintpair = new ChunkPos(pos);
 -            boolean flag = world.getMinecraftWorld().paperConfig.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(chunkcoordintpair.x, chunkcoordintpair.z, ((WorldGenLevel) world).getSeed(), world.getMinecraftWorld().spigotConfig.slimeSeed).nextInt(10) == 0; // Spigot // Paper
 +            boolean flag = world.getMinecraftWorld().paperConfig.allChunksAreSlimeChunks || world.getChunk(chunkcoordintpair.x, chunkcoordintpair.z).isSlimeChunk(); // Spigot // Paper // Matter
  
-             if (random.nextInt(10) == 0 && flag && pos.getY() < 40) {
-                 return checkMobSpawnRules(type, world, spawnReason, pos, random);
+             // Paper start - Replace rules for Height in Slime Chunks
+             final double maxHeightSlimeChunk = world.getMinecraftWorld().paperConfig.slimeMaxSpawnHeightInSlimeChunks;
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
 index 5aeaaae6f15050a2da271fe196d0a234ecafc8a1..ea720517a1adfb164d540c2743aaec2a058d13b8 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
