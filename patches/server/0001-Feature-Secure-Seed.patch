@@ -27,10 +27,10 @@ index f51fcaba69c9ddc27130ab615526e05b1b4f0e07..1ab2bf2e1b0c77b4b8813da91f614d1c
      }
  
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Slime.java b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-index e90d32cf1e6b4045c1afb1e3fc599f0eb9ee0a84..a1497d294f0ddce0d7d4368f82f5180ff360af02 100644
+index b7c8ddc09a1761260919dbd3e49389104ce994e7..9aa0fb92c604627f7f2755f9617a726fcd898429 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Slime.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-@@ -406,7 +406,7 @@ public class Slime extends Mob implements Enemy {
+@@ -418,7 +418,7 @@ public class Slime extends Mob implements Enemy {
              }
  
              ChunkPos chunkcoordintpair = new ChunkPos(pos);
