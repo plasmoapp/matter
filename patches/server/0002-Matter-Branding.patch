@@ -5,7 +5,7 @@ Subject: [PATCH] Matter Branding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 86548210e50879504f646ef3aa46927998f2d775..c033c5e34893b039d369449e562578ee3f798492 100644
+index b2bade12a76ef354a2d0c2e054cbf818751f71b3..cb78c47e014ce3687e684a73944ba4864efefebc 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -18,7 +18,7 @@ repositories {
@@ -15,7 +15,7 @@ index 86548210e50879504f646ef3aa46927998f2d775..c033c5e34893b039d369449e562578ee
 -    implementation(project(":pufferfish-api")) // Pufferfish // Paper
 +    implementation(project(":matter-api")) // Matter // Pufferfish // Paper
      // Pufferfish start
-     implementation("io.papermc.paper:paper-mojangapi:1.18.1-R0.1-SNAPSHOT") {
+     implementation("io.papermc.paper:paper-mojangapi:1.18.2-R0.1-SNAPSHOT") {
          exclude("io.papermc.paper", "paper-api")
 @@ -87,7 +87,7 @@ tasks.jar {
          attributes(
@@ -40,10 +40,10 @@ index e0b1f0671d16ddddcb6725acd25a1d1d69e42701..63384b9353e71e9d310528235f1a39d5
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index a31f8bf3f4183a7a02f58f2321dbeaf427017b1c..a61e8bf20c6d4895684bf358463694da42b55ea0 100644
+index 371b0f95b23d67c9913875a3dd7888e722551f18..9026f9c2bde769af2dc32e0909ad1c01f2b79dc4 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1712,7 +1712,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1695,7 +1695,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -53,10 +53,10 @@ index a31f8bf3f4183a7a02f58f2321dbeaf427017b1c..a61e8bf20c6d4895684bf358463694da
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index e62a643990929dccf1c022a3c9eca12d08d5ca7d..de8772b324eaf8289086603abe28c1c8cd329e9a 100644
+index 0810ca4c657ac289607c92619edc7bd441b2768f..0b49989f46ffc1879275af2c884deaa26c7b4a03 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -251,7 +251,7 @@ import javax.annotation.Nullable; // Paper
+@@ -249,7 +249,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
@@ -66,10 +66,10 @@ index e62a643990929dccf1c022a3c9eca12d08d5ca7d..de8772b324eaf8289086603abe28c1c8
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 98d396658bd7547e6b6f850529cab216e83c6c62..2e584a84154c029b6552529d904dd9432a1eb205 100644
+index 7e06f263cf618b82f77101ef86d819d5dc37a24e..cb5b5e36fa365607c19d49f3a4d81f142b6e0760 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -421,7 +421,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -430,7 +430,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      @Override
      public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {
