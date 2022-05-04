@@ -41,7 +41,7 @@ index ebfaa8d5de5b905bd2dd7778728b8c9939d01252..2bbbc973ddf2b67bdaa142bde67eb493
              return this.generatorSettings;
          }
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index f33ae29fd86fbfb2a94748fbf9515e3b4ae01753..4f5dcff4a8c75a2297d71e3eda0ba441a52d0595 100644
+index b42e32bd1a6a669f498b577ec04661c4ba651198..004b7cb998716ce0b4f1a0ccb7dc502e45a5fa51 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -47,6 +47,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -52,7 +52,7 @@ index f33ae29fd86fbfb2a94748fbf9515e3b4ae01753..4f5dcff4a8c75a2297d71e3eda0ba441
  
  public class ServerChunkCache extends ChunkSource {
  
-@@ -1147,6 +1148,8 @@ public class ServerChunkCache extends ChunkSource {
+@@ -1139,6 +1140,8 @@ public class ServerChunkCache extends ChunkSource {
      }
  
      public ChunkGenerator getGenerator() {
@@ -62,7 +62,7 @@ index f33ae29fd86fbfb2a94748fbf9515e3b4ae01753..4f5dcff4a8c75a2297d71e3eda0ba441
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 5e9ad7c828a196e6fe85bb3e32aa23b95c83b39d..abf5cc83d0d2e508546fb8c1e814af48f15a17f1 100644
+index c63ee396e990d11e2f613f3b5a478b486076ed56..2b56040d2aa4504cd7db6990a689e0c4e2148f9d 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -162,6 +162,7 @@ import org.bukkit.event.weather.LightningStrikeEvent;
@@ -82,10 +82,10 @@ index 5e9ad7c828a196e6fe85bb3e32aa23b95c83b39d..abf5cc83d0d2e508546fb8c1e814af48
          boolean flag2 = minecraftserver.forceSynchronousWrites();
          DataFixer datafixer = minecraftserver.getFixerUpper();
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Slime.java b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-index b6e78e8145ea78d532f22707c7525829c5778076..05317be6c91014a4e03bc7edc558a5ac742e7e50 100644
+index 2e819d32915941bd77034ce599eb787610a6d666..74eb3a0b696c6930bb85e84262b12dd17c9e471c 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Slime.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-@@ -338,7 +338,7 @@ public class Slime extends Mob implements Enemy {
+@@ -343,7 +343,7 @@ public class Slime extends Mob implements Enemy {
              }
  
              ChunkPos chunkcoordintpair = new ChunkPos(pos);
@@ -137,7 +137,7 @@ index 08433670b54c67319ce13ac3ef0f24bd3f819ea0..c3e461019bda2a67e6ff8e34f58d625c
          for (int i = 0; i < sectionArray.length; ++i) {
              if (sectionArray[i] == null) {
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
-index ab64f85de0051fdd4ff2eaa376eeabce2670b466..45c7d02647f8863216ed6ae88a6a2362805080ba 100644
+index daff5a9dd98e791b3f1dc898a082ff3e08adc92e..9effd4157b8765c7adccc84569d830d36002842c 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 @@ -86,6 +86,8 @@ import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
@@ -149,16 +149,16 @@ index ab64f85de0051fdd4ff2eaa376eeabce2670b466..45c7d02647f8863216ed6ae88a6a2362
  
  public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
  
-@@ -221,15 +223,9 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
-             int i = placement.distance();
-             int j = placement.count();
-             int k = placement.spread();
+@@ -229,15 +231,9 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
+             int i = concentricringsstructureplacement.distance();
+             int j = concentricringsstructureplacement.count();
+             int k = concentricringsstructureplacement.spread();
 -            Random random = new Random();
 +            // Matter
 +            Random random = new WorldgenCryptoRandom(0, 0, Globals.Salt.STRONGHOLDS, 0);
  
 -            // Paper start
--            if (strongholdSet.is(net.minecraft.world.level.levelgen.structure.BuiltinStructureSets.STRONGHOLDS) && this.conf.strongholdSeed != null) {
+-            if (this.conf.strongholdSeed != null && this.structureSets.getResourceKey(holder).orElse(null) == net.minecraft.world.level.levelgen.structure.BuiltinStructureSets.STRONGHOLDS) {
 -                random.setSeed(this.conf.strongholdSeed);
 -            } else {
 -            // Paper end
@@ -167,7 +167,7 @@ index ab64f85de0051fdd4ff2eaa376eeabce2670b466..45c7d02647f8863216ed6ae88a6a2362
              double d0 = random.nextDouble() * 3.141592653589793D * 2.0D;
              int l = 0;
              int i1 = 0;
-@@ -503,8 +499,12 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
+@@ -511,8 +507,12 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
                  return structurefeature.feature.step().ordinal();
              }));
              List<BiomeSource.StepFeatureData> list = this.biomeSource.featuresPerStep();
@@ -181,7 +181,7 @@ index ab64f85de0051fdd4ff2eaa376eeabce2670b466..45c7d02647f8863216ed6ae88a6a2362
              Set<Biome> set = new ObjectArraySet();
  
              if (this instanceof FlatLevelSource) {
-@@ -776,9 +776,11 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
+@@ -786,9 +786,11 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
                      ArrayList<StructureSet.StructureSelectionEntry> arraylist = new ArrayList(list.size());
  
                      arraylist.addAll(list);
@@ -218,27 +218,29 @@ index 954e141e5617d6d52e2f3008c25fe9e2fe2f0f9a..3d097782a9d0f99f6dabc0a3603e1ef2
          ProfiledDuration profiledduration = JvmProfiler.INSTANCE.onChunkGenerate(ichunkaccess.getPos(), world.dimension(), this.name);
          CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> completablefuture = this.generationTask.doWork(this, executor, world, generator, structureManager, lightingProvider, fullChunkConverter, chunks, ichunkaccess, flag);
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java b/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java
-index f1aee097318f91d582aa143a77662ec12e812c93..f9c06365c0e9b95d1bb2b52b189ae958c9f74a9b 100644
+index 61dc7d594c4ee15f99fd531d1b2cbaffc63c372d..f13e3eaa2aab15a983679359d40285a22dab61a2 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java
-@@ -14,6 +14,8 @@ import java.util.OptionalLong;
+@@ -16,6 +16,8 @@ import java.util.Optional;
+ import java.util.OptionalLong;
  import java.util.Random;
- import java.util.Map.Entry;
  import java.util.function.Function;
 +import java.util.stream.LongStream;
 +
  import net.minecraft.core.Holder;
  import net.minecraft.core.MappedRegistry;
  import net.minecraft.core.Registry;
-@@ -33,15 +35,24 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
+@@ -36,16 +38,24 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
  import net.minecraft.world.level.levelgen.synth.NormalNoise;
  import org.apache.commons.lang3.StringUtils;
  import org.slf4j.Logger;
 +import su.plo.matter.Globals;
  
  public class WorldGenSettings {
--    public static final Codec<WorldGenSettings> CODEC = RecordCodecBuilder.create((instance) -> {
--        return instance.group(Codec.LONG.fieldOf("seed").stable().forGetter(WorldGenSettings::seed), Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldGenSettings::generateFeatures), Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldGenSettings::generateBonusChest), RegistryCodecs.dataPackAwareCodec(Registry.LEVEL_STEM_REGISTRY, Lifecycle.stable(), LevelStem.CODEC).xmap(LevelStem::sortMap, Function.identity()).fieldOf("dimensions").forGetter(WorldGenSettings::dimensions), Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter((worldGenSettings) -> {
+-
+-    public static final Codec<WorldGenSettings> CODEC = RecordCodecBuilder.<WorldGenSettings>create((instance) -> { // CraftBukkit - decompile error
+-        return instance.group(Codec.LONG.fieldOf("seed").stable().forGetter(WorldGenSettings::seed), Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldGenSettings::generateFeatures), Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldGenSettings::generateBonusChest), RegistryCodecs.dataPackAwareCodec(Registry.LEVEL_STEM_REGISTRY, Lifecycle.stable(), LevelStem.CODEC).xmap(LevelStem::sortMap, Function.identity()).fieldOf("dimensions").forGetter(WorldGenSettings::dimensions), Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter((generatorsettings) -> {
+-            return generatorsettings.legacyCustomOptions;
 +    public static final Codec<WorldGenSettings> CODEC = RecordCodecBuilder.<WorldGenSettings>create((instance) -> {
 +        return instance.group(Codec.LONG.fieldOf("seed").stable().forGetter(WorldGenSettings::seed),
 +                Codec.LONG_STREAM.fieldOf("feature_seed").stable().forGetter((settings) -> LongStream.of(settings.featureSeed())), // Matter
@@ -246,7 +248,7 @@ index f1aee097318f91d582aa143a77662ec12e812c93..f9c06365c0e9b95d1bb2b52b189ae958
 +                Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldGenSettings::generateBonusChest),
 +                RegistryCodecs.dataPackAwareCodec(Registry.LEVEL_STEM_REGISTRY, Lifecycle.stable(), LevelStem.CODEC).xmap(LevelStem::sortMap, Function.identity()).fieldOf("dimensions").forGetter(WorldGenSettings::dimensions),
 +                Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter((WorldGenSettings worldGenSettings) -> {
-             return worldGenSettings.legacyCustomOptions;
++            return worldGenSettings.legacyCustomOptions;
          })).apply(instance, instance.stable(WorldGenSettings::new));
      }).comapFlatMap(WorldGenSettings::guardExperimental, Function.identity());
 +
@@ -257,16 +259,19 @@ index f1aee097318f91d582aa143a77662ec12e812c93..f9c06365c0e9b95d1bb2b52b189ae958
      private final boolean generateFeatures;
      private final boolean generateBonusChest;
      private final Registry<LevelStem> dimensions;
-@@ -60,30 +71,38 @@ public class WorldGenSettings {
+@@ -61,33 +71,38 @@ public class WorldGenSettings {
          return LevelStem.stable(this.seed, this.dimensions);
      }
  
 -    public WorldGenSettings(long seed, boolean generateStructures, boolean bonusChest, Registry<LevelStem> options) {
 -        this(seed, generateStructures, bonusChest, options, Optional.empty());
+-        LevelStem worlddimension = (LevelStem) options.get(LevelStem.OVERWORLD);
+-
+-        if (worlddimension == null) {
 +    public WorldGenSettings(long seed, long[] featureSeed, boolean generateStructures, boolean bonusChest, Registry<LevelStem> options) {
 +        this(seed, featureSeed, generateStructures, bonusChest, options, Optional.empty());
-         LevelStem levelStem = options.get(LevelStem.OVERWORLD);
-         if (levelStem == null) {
++        LevelStem levelStem = options.get(LevelStem.OVERWORLD);
++        if (levelStem == null) {
              throw new IllegalStateException("Overworld settings missing");
          }
      }
@@ -288,20 +293,22 @@ index f1aee097318f91d582aa143a77662ec12e812c93..f9c06365c0e9b95d1bb2b52b189ae958
  
      public static WorldGenSettings demoSettings(RegistryAccess registryManager) {
          int i = "North Carolina".hashCode();
--        return new WorldGenSettings((long)i, true, true, withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, (long)i), makeDefaultOverworld(registryManager, (long)i)));
+-
+-        return new WorldGenSettings((long) i, true, true, WorldGenSettings.withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, (long) i), WorldGenSettings.makeDefaultOverworld(registryManager, (long) i)));
 +        // Matter
-+        return new WorldGenSettings(i, Globals.parseSeed("North Carolina").get(), true, true, withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, (long)i), makeDefaultOverworld(registryManager, (long)i)));
++        return new WorldGenSettings((long) i, Globals.parseSeed("North Carolina").get(), true, true, WorldGenSettings.withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, (long) i), WorldGenSettings.makeDefaultOverworld(registryManager, (long) i)));
      }
  
      public static WorldGenSettings makeDefault(RegistryAccess registryManager) {
-         long l = (new Random()).nextLong();
--        return new WorldGenSettings(l, true, false, withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, l), makeDefaultOverworld(registryManager, l)));
+         long i = (new Random()).nextLong();
+-
+-        return new WorldGenSettings(i, true, false, WorldGenSettings.withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, i), WorldGenSettings.makeDefaultOverworld(registryManager, i)));
 +        // Matter
-+        return new WorldGenSettings(l, Globals.createRandomWorldSeed(), true, false, withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, l), makeDefaultOverworld(registryManager, l)));
++        return new WorldGenSettings(i, Globals.createRandomWorldSeed(), true, false, WorldGenSettings.withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, i), WorldGenSettings.makeDefaultOverworld(registryManager, i)));
      }
  
      public static NoiseBasedChunkGenerator makeDefaultOverworld(RegistryAccess registryManager, long seed) {
-@@ -110,6 +129,12 @@ public class WorldGenSettings {
+@@ -115,6 +130,12 @@ public class WorldGenSettings {
          return this.seed;
      }
  
@@ -314,7 +321,7 @@ index f1aee097318f91d582aa143a77662ec12e812c93..f9c06365c0e9b95d1bb2b52b189ae958
      public boolean generateFeatures() {
          return this.generateFeatures;
      }
-@@ -176,19 +201,24 @@ public class WorldGenSettings {
+@@ -187,18 +208,23 @@ public class WorldGenSettings {
      }
  
      public WorldGenSettings withBonusChest() {
@@ -336,60 +343,60 @@ index f1aee097318f91d582aa143a77662ec12e812c93..f9c06365c0e9b95d1bb2b52b189ae958
      }
  
      public static WorldGenSettings create(RegistryAccess registryManager, DedicatedServerProperties.WorldGenProperties worldGenProperties) {
-         long l = parseSeed(worldGenProperties.levelSeed()).orElse((new Random()).nextLong());
 +        // Matter
 +        long[] featureSeed = Globals.parseSeed(worldGenProperties.featureSeed()).orElse(Globals.createRandomWorldSeed());
-         Registry<DimensionType> registry = registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
-         Registry<Biome> registry2 = registryManager.registryOrThrow(Registry.BIOME_REGISTRY);
-         Registry<StructureSet> registry3 = registryManager.registryOrThrow(Registry.STRUCTURE_SET_REGISTRY);
-@@ -197,22 +227,28 @@ public class WorldGenSettings {
-         switch(var8) {
-         case "flat":
-             Dynamic<JsonElement> dynamic = new Dynamic<>(JsonOps.INSTANCE, worldGenProperties.generatorSettings());
--            return new WorldGenSettings(l, worldGenProperties.generateStructures(), false, withOverworld(registry, registry4, new FlatLevelSource(registry3, FlatLevelGeneratorSettings.CODEC.parse(dynamic).resultOrPartial(LOGGER::error).orElseGet(() -> {
-+            return new WorldGenSettings(l, featureSeed, worldGenProperties.generateStructures(), false, withOverworld(registry, registry4, new FlatLevelSource(registry3, FlatLevelGeneratorSettings.CODEC.parse(dynamic).resultOrPartial(LOGGER::error).orElseGet(() -> {
-                 return FlatLevelGeneratorSettings.getDefault(registry2, registry3);
-             }))));
-         case "debug_all_block_states":
--            return new WorldGenSettings(l, worldGenProperties.generateStructures(), false, withOverworld(registry, registry4, new DebugLevelSource(registry3, registry2)));
-+            // Matter
-+            return new WorldGenSettings(l, featureSeed, worldGenProperties.generateStructures(), false, withOverworld(registry, registry4, new DebugLevelSource(registry3, registry2)));
-         case "amplified":
--            return new WorldGenSettings(l, worldGenProperties.generateStructures(), false, withOverworld(registry, registry4, makeOverworld(registryManager, l, NoiseGeneratorSettings.AMPLIFIED)));
-+            // Matter
-+            return new WorldGenSettings(l, featureSeed, worldGenProperties.generateStructures(), false, withOverworld(registry, registry4, makeOverworld(registryManager, l, NoiseGeneratorSettings.AMPLIFIED)));
-         case "largebiomes":
--            return new WorldGenSettings(l, worldGenProperties.generateStructures(), false, withOverworld(registry, registry4, makeOverworld(registryManager, l, NoiseGeneratorSettings.LARGE_BIOMES)));
-+            // Matter
-+            return new WorldGenSettings(l, featureSeed, worldGenProperties.generateStructures(), false, withOverworld(registry, registry4, makeOverworld(registryManager, l, NoiseGeneratorSettings.LARGE_BIOMES)));
-         default:
--            return new WorldGenSettings(l, worldGenProperties.generateStructures(), false, withOverworld(registry, registry4, makeDefaultOverworld(registryManager, l)));
-+            // Matter
-+            return new WorldGenSettings(l, featureSeed, worldGenProperties.generateStructures(), false, withOverworld(registry, registry4, makeDefaultOverworld(registryManager, l)));
+         long i = WorldGenSettings.parseSeed(worldGenProperties.levelSeed()).orElse((new Random()).nextLong());
+         Registry<DimensionType> iregistry = registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+         Registry<Biome> iregistry1 = registryManager.registryOrThrow(Registry.BIOME_REGISTRY);
+@@ -237,24 +263,30 @@ public class WorldGenSettings {
+                 Logger logger = WorldGenSettings.LOGGER;
+ 
+                 Objects.requireNonNull(logger);
+-                return new WorldGenSettings(i, flag, false, WorldGenSettings.withOverworld(iregistry, iregistry3, new FlatLevelSource(iregistry2, (FlatLevelGeneratorSettings) dataresult.resultOrPartial(s1 -> logger.error(String.valueOf(s1))).orElseGet(() -> { // CraftBukkit - decompile error
++                // Matter
++                return new WorldGenSettings(i, featureSeed, flag, false, WorldGenSettings.withOverworld(iregistry, iregistry3, new FlatLevelSource(iregistry2, (FlatLevelGeneratorSettings) dataresult.resultOrPartial(s1 -> logger.error(String.valueOf(s1))).orElseGet(() -> { // CraftBukkit - decompile error
+                     return FlatLevelGeneratorSettings.getDefault(iregistry1, iregistry2);
+                 }))));
+             case 1:
+-                return new WorldGenSettings(i, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, new DebugLevelSource(iregistry2, iregistry1)));
++                // Matter
++                return new WorldGenSettings(i, featureSeed, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, new DebugLevelSource(iregistry2, iregistry1)));
+             case 2:
+-                return new WorldGenSettings(i, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeOverworld(registryManager, i, NoiseGeneratorSettings.AMPLIFIED)));
++                // Matter
++                return new WorldGenSettings(i, featureSeed, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeOverworld(registryManager, i, NoiseGeneratorSettings.AMPLIFIED)));
+             case 3:
+-                return new WorldGenSettings(i, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeOverworld(registryManager, i, NoiseGeneratorSettings.LARGE_BIOMES)));
++                // Matter
++                return new WorldGenSettings(i, featureSeed, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeOverworld(registryManager, i, NoiseGeneratorSettings.LARGE_BIOMES)));
+             default:
+-                return new WorldGenSettings(i, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeDefaultOverworld(registryManager, i)));
++                // Matter
++                return new WorldGenSettings(i, featureSeed, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeDefaultOverworld(registryManager, i)));
          }
      }
  
      public WorldGenSettings withSeed(boolean hardcore, OptionalLong seed) {
-         long l = seed.orElse(this.seed);
+         long i = seed.orElse(this.seed);
+         Object object;
+-
 +        // Matter
 +        long[] featureSeed = Globals.createRandomWorldSeed();
-         Registry<LevelStem> registry;
          if (seed.isPresent()) {
-             WritableRegistry<LevelStem> writableRegistry = new MappedRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental(), (Function<LevelStem, Holder.Reference<LevelStem>>)null);
-@@ -230,9 +266,11 @@ public class WorldGenSettings {
+             WritableRegistry<LevelStem> iregistrywritable = new MappedRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental(), (Function) null);
+             long j = seed.getAsLong();
+@@ -275,9 +307,9 @@ public class WorldGenSettings {
+         WorldGenSettings generatorsettings;
  
-         WorldGenSettings worldGenSettings;
          if (this.isDebug()) {
--            worldGenSettings = new WorldGenSettings(l, false, false, registry);
-+            // Matter
-+            worldGenSettings = new WorldGenSettings(l, featureSeed, false, false, registry);
+-            generatorsettings = new WorldGenSettings(i, false, false, (Registry) object);
++            generatorsettings = new WorldGenSettings(i, featureSeed, false, false, (Registry) object);
          } else {
--            worldGenSettings = new WorldGenSettings(l, this.generateFeatures(), this.generateBonusChest() && !hardcore, registry);
-+            // Matter
-+            worldGenSettings = new WorldGenSettings(l, featureSeed, this.generateFeatures(), this.generateBonusChest() && !hardcore, registry);
+-            generatorsettings = new WorldGenSettings(i, this.generateFeatures(), this.generateBonusChest() && !hardcore, (Registry) object);
++            generatorsettings = new WorldGenSettings(i, featureSeed, this.generateFeatures(), this.generateBonusChest() && !hardcore, (Registry) object);
          }
  
-         return worldGenSettings;
+         return generatorsettings;
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
 index 8204b39496e26baf9454b117f7a5d80735956d3e..415898770c08e30dc1b0ee26119d199991432740 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
@@ -792,7 +799,7 @@ index fc6ea073dda463a0d0fcdc2c40b1b6ef2339c6af..0fc9e49f314c963556474eda9d153b23
          int j = context.chunkPos().getMinBlockZ() + worldgenRandom.nextInt(16);
          int k = context.chunkGenerator().getSeaLevel();
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
-index cc8784df741f6cbe51e50d5414f078676907af1b..e430bcdec3883f58d7ad32430d05a9f316355c59 100644
+index 42152827c5b1393c9b7efa88017435716eb585c0..5c528eb1ecaa7c21a131f8c5258c142b06d83bc7 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
 @@ -9,9 +9,12 @@ import net.minecraft.world.level.ChunkPos;
@@ -809,27 +816,7 @@ index cc8784df741f6cbe51e50d5414f078676907af1b..e430bcdec3883f58d7ad32430d05a9f3
          return instance.group(Codec.intRange(0, 4096).fieldOf("spacing").forGetter(RandomSpreadStructurePlacement::spacing), Codec.intRange(0, 4096).fieldOf("separation").forGetter(RandomSpreadStructurePlacement::separation), RandomSpreadType.CODEC.optionalFieldOf("spread_type", RandomSpreadType.LINEAR).forGetter(RandomSpreadStructurePlacement::spreadType), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("salt").forGetter(RandomSpreadStructurePlacement::salt), Vec3i.offsetCodec(16).optionalFieldOf("locate_offset", Vec3i.ZERO).forGetter(RandomSpreadStructurePlacement::locateOffset)).apply(instance, RandomSpreadStructurePlacement::new);
      }).flatXmap((placement) -> {
          return placement.spacing <= placement.separation ? DataResult.error("Spacing has to be larger than separation") : DataResult.success(placement);
-@@ -21,12 +24,13 @@ public record RandomSpreadStructurePlacement(int spacing, int separation, Random
-         this(spacing, separation, spreadType, salt, Vec3i.ZERO);
-     }
- 
--    public RandomSpreadStructurePlacement(int i, int j, RandomSpreadType randomSpreadType, int k, Vec3i vec3i) {
--        this.spacing = i;
--        this.separation = j;
--        this.spreadType = randomSpreadType;
--        this.salt = k;
--        this.locateOffset = vec3i;
-+    // Matter - compile fix
-+    public RandomSpreadStructurePlacement(int spacing, int separation, RandomSpreadType spreadType, int salt, Vec3i locateOffset) {
-+        this.spacing = spacing;
-+        this.separation = separation;
-+        this.spreadType = spreadType;
-+        this.salt = salt;
-+        this.locateOffset = locateOffset;
-     }
- 
-     public ChunkPos getPotentialFeatureChunk(long seed, int x, int z) {
-@@ -34,8 +38,11 @@ public record RandomSpreadStructurePlacement(int spacing, int separation, Random
+@@ -26,8 +29,11 @@ public record RandomSpreadStructurePlacement(int spacing, int separation, Random
          int j = this.separation();
          int k = Math.floorDiv(x, i);
          int l = Math.floorDiv(z, i);
@@ -909,10 +896,10 @@ index 403aba29347c779da75337531c3723632120e7c9..e4a468003744e6299d4a5c17af9d7fa3
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index cc88eb1247bafb65999e1ca5624c87b038b27866..9cf16088f3a632054c30216840df0c6c2174e1a6 100644
+index f4a82b1f2dc26f938d3dcb23ec32f135a1bfd163..07f082514a28118c5ab49ca68560f7e838abf3ea 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -243,6 +243,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
+@@ -244,6 +244,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
  import org.yaml.snakeyaml.error.MarkedYAMLException;
  
  import net.md_5.bungee.api.chat.BaseComponent; // Spigot
@@ -920,7 +907,7 @@ index cc88eb1247bafb65999e1ca5624c87b038b27866..9cf16088f3a632054c30216840df0c6c
  
  import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
-@@ -1192,7 +1193,8 @@ public final class CraftServer implements Server {
+@@ -1193,7 +1194,8 @@ public final class CraftServer implements Server {
          LevelSettings worldSettings;
          // See MinecraftServer.a(String, String, long, WorldType, JsonElement)
          if (worlddata == null) {
