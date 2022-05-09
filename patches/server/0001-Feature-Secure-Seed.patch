@@ -62,7 +62,7 @@ index b42e32bd1a6a669f498b577ec04661c4ba651198..004b7cb998716ce0b4f1a0ccb7dc502e
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index c63ee396e990d11e2f613f3b5a478b486076ed56..2b56040d2aa4504cd7db6990a689e0c4e2148f9d 100644
+index 93c1f9e3e9d62cc993fedb93fe43cbeed7d39542..f9de66e6a37fc16c76606ad6562b16e42c6adcac 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -162,6 +162,7 @@ import org.bukkit.event.weather.LightningStrikeEvent;
@@ -73,7 +73,7 @@ index c63ee396e990d11e2f613f3b5a478b486076ed56..2b56040d2aa4504cd7db6990a689e0c4
  
  public class ServerLevel extends Level implements WorldGenLevel {
  
-@@ -505,6 +506,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -506,6 +507,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          }
          chunkgenerator.conf = spigotConfig; // Spigot
          // CraftBukkit end
