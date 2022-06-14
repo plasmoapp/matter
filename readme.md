@@ -5,7 +5,7 @@
   <div>
     <a href="https://github.com/plasmoapp/matter/">GitHub</a>
     <span> | </span>
-    <a href="https://matter.plo.su/job/Matter-1.18/">Download</a>
+    <a href="https://matter.plo.su/job/Matter-1.19/">Download</a>
     <span> | </span>
     <a href="https://discord.com/invite/uueEqzwCJJ">Discord</a>
   </div>
@@ -35,7 +35,7 @@ We are also planning to add an ability to change seed for the biome generation. 
 
 ## Download
 
-[Click here to download from Jenkins](https://matter.plo.su/job/Matter-1.18/)
+[Click here to download from Jenkins](https://matter.plo.su/job/Matter-1.19/)
 
 ## How to use
 
