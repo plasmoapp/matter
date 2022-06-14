@@ -5,7 +5,7 @@ Subject: [PATCH] Matter Branding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 9521971e9e597834e785b36d1657064dc1621b9b..af040f475d8db1478bb778dee97262e95fb64349 100644
+index a4a146d9c3e07bdf941d81147ca31daf4689a687..a759af3745a32081420a5a17ea2ad698027b75d7 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -9,7 +9,7 @@ plugins {
@@ -15,9 +15,9 @@ index 9521971e9e597834e785b36d1657064dc1621b9b..af040f475d8db1478bb778dee97262e9
 -    implementation(project(":pufferfish-api")) // Pufferfish // Paper
 +    implementation(project(":matter-api")) // Matter // Pufferfish // Paper
      // Pufferfish start
-     implementation("io.papermc.paper:paper-mojangapi:1.18.2-R0.1-SNAPSHOT") {
+     implementation("io.papermc.paper:paper-mojangapi:1.19-R0.1-SNAPSHOT") {
          exclude("io.papermc.paper", "paper-api")
-@@ -78,7 +78,7 @@ tasks.jar {
+@@ -84,7 +84,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
@@ -27,7 +27,7 @@ index 9521971e9e597834e785b36d1657064dc1621b9b..af040f475d8db1478bb778dee97262e9
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
 diff --git a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
-index e0b1f0671d16ddddcb6725acd25a1d1d69e42701..63384b9353e71e9d310528235f1a39d58489ae55 100644
+index b0390eedb507d27426d1e1d73bd4ab63aec89ebe..1533dadb02f9d189be0e6725c73a28f293e30160 100644
 --- a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
 +++ b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
 @@ -17,7 +17,7 @@ public final class PaperConsole extends SimpleTerminalConsole {
@@ -40,10 +40,10 @@ index e0b1f0671d16ddddcb6725acd25a1d1d69e42701..63384b9353e71e9d310528235f1a39d5
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 371b0f95b23d67c9913875a3dd7888e722551f18..9026f9c2bde769af2dc32e0909ad1c01f2b79dc4 100644
+index 99751fc36a332f2f9115b56ed6ca66ab037825d3..00398a8df97697896465f5b0d3b92a02c399eb5f 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1695,7 +1695,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1656,7 +1656,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -53,10 +53,10 @@ index 371b0f95b23d67c9913875a3dd7888e722551f18..9026f9c2bde769af2dc32e0909ad1c01
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 07f082514a28118c5ab49ca68560f7e838abf3ea..e4f117239c46aea75370e152c95b092160c7ca05 100644
+index c8ce729ea50ed2f4bdd2cafdadb7278cfef1f5a2..3c333590af07c829cb3e2d188ad3957eee80a0bc 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -250,7 +250,7 @@ import javax.annotation.Nullable; // Paper
+@@ -244,7 +244,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
@@ -66,10 +66,10 @@ index 07f082514a28118c5ab49ca68560f7e838abf3ea..e4f117239c46aea75370e152c95b0921
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index fbe68bd4739d9a0e7d9bc4c3d5ba8ecfd2d13954..dc8bf6907e69868b2f28c556c3ba35b3c8a5f705 100644
+index fbd604602024522bdd73aa1bde6fe2ccec63e442..04edfb423e0ac4dab32dfd21a3b65859030124c1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -265,7 +265,7 @@ public class Main {
+@@ -270,7 +270,7 @@ public class Main {
                      if (buildDate.before(deadline.getTime())) {
                          // Paper start - This is some stupid bullshit
                          System.err.println("*** Warning, you've not updated in a while! ***");
@@ -79,7 +79,7 @@ index fbe68bd4739d9a0e7d9bc4c3d5ba8ecfd2d13954..dc8bf6907e69868b2f28c556c3ba35b3
                          //Thread.sleep(TimeUnit.SECONDS.toMillis(20));
                          // Paper End
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 7e06f263cf618b82f77101ef86d819d5dc37a24e..cb5b5e36fa365607c19d49f3a4d81f142b6e0760 100644
+index 2d9c98931df5d1c54adcfba78a9136841764f853..2560c1c5d818d97d0c9394094d782b3833cdf7e7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -430,7 +430,7 @@ public final class CraftMagicNumbers implements UnsafeValues {

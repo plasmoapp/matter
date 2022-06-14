@@ -5,46 +5,41 @@ Subject: [PATCH] Feature Secure Seed
 
 
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
-index ebfaa8d5de5b905bd2dd7778728b8c9939d01252..2bbbc973ddf2b67bdaa142bde67eb493049f8ebc 100644
+index 26345494ce190b5cd2ab58dd7d4b046796767b20..5212a4fc7ce68e4345882b9f25b7e410883a951d 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
-@@ -121,7 +121,7 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
-         this.textFilteringConfig = this.get("text-filtering-config", "");
+@@ -148,7 +148,8 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
          this.playerIdleTimeout = this.getMutable("player-idle-timeout", 0);
          this.whiteList = this.getMutable("white-list", false);
+         this.enforceSecureProfile = this.get("enforce-secure-profile", false);
 -        this.worldGenProperties = new DedicatedServerProperties.WorldGenProperties(this.get("level-seed", ""), (JsonObject) this.get("generator-settings", (s) -> {
++        // Matter - Feature Secure Seed
 +        this.worldGenProperties = new DedicatedServerProperties.WorldGenProperties(this.get("level-seed", ""), this.get("feature-level-seed", ""), (JsonObject) this.get("generator-settings", (s) -> {
              return GsonHelper.parse(!s.isEmpty() ? s : "{}");
          }, new JsonObject()), this.get("generate-structures", true), (String) this.get("level-type", (s) -> {
              return s.toLowerCase(Locale.ROOT);
-@@ -154,8 +154,8 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
+@@ -225,10 +226,14 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
          return this.worldGenSettings;
      }
  
--    // CraftBukkit start - decompile error
 -    public static record WorldGenProperties(String levelSeed, JsonObject generatorSettings, boolean generateStructures, String levelType) {
-+    // CraftBukkit start - decompile error // Matter
+-
 +    public static record WorldGenProperties(String levelSeed, String featureSeed, JsonObject generatorSettings, boolean generateStructures, String levelType) {
+         private static final Map<String, ResourceKey<WorldPreset>> LEGACY_PRESET_NAMES = Map.of("default", WorldPresets.NORMAL, "largebiomes", WorldPresets.LARGE_BIOMES);
  
-         /*
-         private final String levelSeed;
-@@ -176,6 +176,11 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
-             return this.levelSeed;
-         }
- 
-+        // Matter
++        // Matter todo: check why?
 +        public String featureSeed() {
 +            return this.featureSeed;
 +        }
 +
-         public JsonObject generatorSettings() {
-             return this.generatorSettings;
-         }
+         public WorldGenSettings create(RegistryAccess dynamicRegistryManager) {
+             long i = WorldGenSettings.parseSeed(this.levelSeed()).orElse(RandomSource.create().nextLong());
+             Registry<WorldPreset> iregistry = dynamicRegistryManager.registryOrThrow(Registry.WORLD_PRESET_REGISTRY);
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index b42e32bd1a6a669f498b577ec04661c4ba651198..004b7cb998716ce0b4f1a0ccb7dc502e45a5fa51 100644
+index 378cc1f9e19eb9b18037ab8af92f65897e15a405..33cb2fc823624b40a32c6f5513abb073214a8ffd 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -47,6 +47,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
+@@ -48,6 +48,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
  import net.minecraft.world.level.storage.LevelData;
  import net.minecraft.world.level.storage.LevelStorageSource;
  import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet; // Paper
@@ -52,7 +47,7 @@ index b42e32bd1a6a669f498b577ec04661c4ba651198..004b7cb998716ce0b4f1a0ccb7dc502e
  
  public class ServerChunkCache extends ChunkSource {
  
-@@ -1139,6 +1140,8 @@ public class ServerChunkCache extends ChunkSource {
+@@ -1140,6 +1141,8 @@ public class ServerChunkCache extends ChunkSource {
      }
  
      public ChunkGenerator getGenerator() {
@@ -62,51 +57,54 @@ index b42e32bd1a6a669f498b577ec04661c4ba651198..004b7cb998716ce0b4f1a0ccb7dc502e
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 93c1f9e3e9d62cc993fedb93fe43cbeed7d39542..f9de66e6a37fc16c76606ad6562b16e42c6adcac 100644
+index 8043a1aa9d785c78e220ea54a6ffa7388f2d501e..253698b4006ec45fa09198b8e39fddf33af3882b 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -162,6 +162,7 @@ import org.bukkit.event.weather.LightningStrikeEvent;
- import org.bukkit.event.world.TimeSkipEvent;
+@@ -170,6 +170,10 @@ import org.bukkit.event.world.TimeSkipEvent;
  // CraftBukkit end
  import it.unimi.dsi.fastutil.ints.IntArrayList; // Paper
-+import su.plo.matter.Globals;
  
++// Matter start
++import su.plo.matter.Globals;
++// Matter end
++
  public class ServerLevel extends Level implements WorldGenLevel {
  
-@@ -506,6 +507,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+     public static final BlockPos END_SPAWN_POINT = new BlockPos(100, 50, 0);
+@@ -524,6 +528,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          }
          chunkgenerator.conf = spigotConfig; // Spigot
          // CraftBukkit end
 +        Globals.setupGlobals(this); // Matter
-         chunkgenerator.ensureStructuresGenerated();
          boolean flag2 = minecraftserver.forceSynchronousWrites();
          DataFixer datafixer = minecraftserver.getFixerUpper();
+         EntityPersistentStorage<Entity> entitypersistentstorage = new EntityStorage(this, convertable_conversionsession.getDimensionPath(resourcekey).resolve("entities"), datafixer, flag2, minecraftserver);
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Slime.java b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-index 2e819d32915941bd77034ce599eb787610a6d666..74eb3a0b696c6930bb85e84262b12dd17c9e471c 100644
+index 7e85ad7ba31bbb32ea1e1dff5d1c83e7ce68b4b3..94a1868843407d421e6aa3b7719cff6727eb113c 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Slime.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-@@ -343,7 +343,7 @@ public class Slime extends Mob implements Enemy {
+@@ -338,7 +338,7 @@ public class Slime extends Mob implements Enemy {
              }
  
              ChunkPos chunkcoordintpair = new ChunkPos(pos);
--            boolean flag = world.getMinecraftWorld().paperConfig.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(chunkcoordintpair.x, chunkcoordintpair.z, ((WorldGenLevel) world).getSeed(), world.getMinecraftWorld().spigotConfig.slimeSeed).nextInt(10) == 0; // Spigot // Paper
-+            boolean flag = world.getMinecraftWorld().paperConfig.allChunksAreSlimeChunks || world.getChunk(chunkcoordintpair.x, chunkcoordintpair.z).isSlimeChunk(); // Spigot // Paper // Matter
+-            boolean flag = world.getMinecraftWorld().paperConfig().entities.spawning.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(chunkcoordintpair.x, chunkcoordintpair.z, ((WorldGenLevel) world).getSeed(), world.getMinecraftWorld().spigotConfig.slimeSeed).nextInt(10) == 0; // Spigot // Paper
++            boolean flag = world.getMinecraftWorld().paperConfig().entities.spawning.allChunksAreSlimeChunks || world.getChunk(chunkcoordintpair.x, chunkcoordintpair.z).isSlimeChunk(); // Spigot // Paper // Matter
  
              // Paper start - Replace rules for Height in Slime Chunks
-             final double maxHeightSlimeChunk = world.getMinecraftWorld().paperConfig.slimeMaxSpawnHeightInSlimeChunks;
+             final double maxHeightSlimeChunk = world.getMinecraftWorld().paperConfig().entities.spawning.slimeSpawnHeight.slimeChunk.maximum;
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-index 08433670b54c67319ce13ac3ef0f24bd3f819ea0..c3e461019bda2a67e6ff8e34f58d625ce13c806c 100644
+index 8d7d10f620b30c35d2ef580ea914f2c62054a785..c06ee8618b58806e7114f0c253dcc48e4386bf14 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-@@ -53,6 +53,7 @@ import net.minecraft.world.level.material.Fluid;
+@@ -50,6 +50,7 @@ import net.minecraft.world.level.material.Fluid;
  import net.minecraft.world.ticks.SerializableTickContainer;
  import net.minecraft.world.ticks.TickContainerAccess;
  import org.slf4j.Logger;
 +import su.plo.matter.WorldgenCryptoRandom;
  
- public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiomeSource, FeatureAccess {
+ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiomeSource, StructureAccess {
  
-@@ -80,6 +81,11 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
+@@ -77,6 +78,11 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
      protected final LevelHeightAccessor levelHeightAccessor;
      protected final LevelChunkSection[] sections;
  
@@ -118,7 +116,7 @@ index 08433670b54c67319ce13ac3ef0f24bd3f819ea0..c3e461019bda2a67e6ff8e34f58d625c
      // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
      private static final org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry();
      public org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer persistentDataContainer = new org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer(ChunkAccess.DATA_TYPE_REGISTRY);
-@@ -150,6 +156,17 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
+@@ -147,6 +153,17 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
      public final Registry<Biome> biomeRegistry;
      // CraftBukkit end
  
@@ -137,58 +135,61 @@ index 08433670b54c67319ce13ac3ef0f24bd3f819ea0..c3e461019bda2a67e6ff8e34f58d625c
          for (int i = 0; i < sectionArray.length; ++i) {
              if (sectionArray[i] == null) {
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
-index daff5a9dd98e791b3f1dc898a082ff3e08adc92e..9effd4157b8765c7adccc84569d830d36002842c 100644
+index cdfe2589ca598263d58a11a978e176ab3ecb87e6..805510b9eeec2c48bfe2aae680483b1286daca24 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
-@@ -86,6 +86,8 @@ import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
- import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
+@@ -86,6 +86,11 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
  import org.apache.commons.lang3.mutable.MutableBoolean;
  import org.slf4j.Logger;
+ 
++// Matter start
 +import su.plo.matter.Globals;
 +import su.plo.matter.WorldgenCryptoRandom;
++// Matter end
++
+ public abstract class ChunkGenerator {
  
- public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
- 
-@@ -229,15 +231,9 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
-             int i = concentricringsstructureplacement.distance();
+     private static final Logger LOGGER = LogUtils.getLogger();
+@@ -234,15 +239,9 @@ public abstract class ChunkGenerator {
              int j = concentricringsstructureplacement.count();
              int k = concentricringsstructureplacement.spread();
--            Random random = new Random();
+             HolderSet<Biome> holderset = concentricringsstructureplacement.preferredBiomes();
+-            RandomSource randomsource = RandomSource.create();
 +            // Matter
-+            Random random = new WorldgenCryptoRandom(0, 0, Globals.Salt.STRONGHOLDS, 0);
++            RandomSource randomsource = new WorldgenCryptoRandom(0, 0, Globals.Salt.STRONGHOLDS, 0);
  
 -            // Paper start
 -            if (this.conf.strongholdSeed != null && this.structureSets.getResourceKey(holder).orElse(null) == net.minecraft.world.level.levelgen.structure.BuiltinStructureSets.STRONGHOLDS) {
--                random.setSeed(this.conf.strongholdSeed);
+-                randomsource.setSeed(this.conf.strongholdSeed);
 -            } else {
+-            randomsource.setSeed(this instanceof FlatLevelSource ? 0L : randomstate.legacyLevelSeed());
+-            }
 -            // Paper end
--            random.setSeed(this.ringPlacementSeed);
--            } // Paper
-             double d0 = random.nextDouble() * 3.141592653589793D * 2.0D;
+             double d0 = randomsource.nextDouble() * 3.141592653589793D * 2.0D;
              int l = 0;
              int i1 = 0;
-@@ -511,8 +507,12 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
-                 return structurefeature.feature.step().ordinal();
+@@ -514,8 +513,12 @@ public abstract class ChunkGenerator {
+                 return structure.step().ordinal();
              }));
-             List<BiomeSource.StepFeatureData> list = this.biomeSource.featuresPerStep();
--            WorldgenRandom seededrandom = new WorldgenRandom(new XoroshiroRandomSource(RandomSupport.seedUniquifier()));
-+            // Matter start
+             List<FeatureSorter.StepFeatureData> list = (List) this.featuresPerStep.get();
+-            WorldgenRandom seededrandom = new WorldgenRandom(new XoroshiroRandomSource(RandomSupport.generateUniqueSeed()));
++            // Matter start - Feature Secure Seed
 +            WorldgenRandom seededrandom = new WorldgenCryptoRandom(
 +                    blockposition.getX(), blockposition.getZ(), Globals.Salt.UNDEFINED, 0
 +            );
              long i = seededrandom.setDecorationSeed(generatoraccessseed.getSeed(), blockposition.getX(), blockposition.getZ());
 +            // Matter end
-             Set<Biome> set = new ObjectArraySet();
+             Set<Holder<Biome>> set = new ObjectArraySet();
  
-             if (this instanceof FlatLevelSource) {
-@@ -786,9 +786,11 @@ public abstract class ChunkGenerator implements BiomeManager.NoiseBiomeSource {
+             ChunkPos.rangeClosed(sectionposition.chunk(), 1).forEach((chunkcoordintpair1) -> {
+@@ -774,9 +777,11 @@ public abstract class ChunkGenerator {
                      ArrayList<StructureSet.StructureSelectionEntry> arraylist = new ArrayList(list.size());
  
                      arraylist.addAll(list);
 -                    WorldgenRandom seededrandom = new WorldgenRandom(new LegacyRandomSource(0L));
 -
--                    seededrandom.setLargeFeatureSeed(worldSeed, chunkcoordintpair.x, chunkcoordintpair.z);
-+                    // Matter start
+-                    seededrandom.setLargeFeatureSeed(seed, chunkcoordintpair.x, chunkcoordintpair.z);
++                    // Matter start - Feature Secure Seed
 +                    WorldgenRandom seededrandom = new WorldgenCryptoRandom(
 +                            chunkcoordintpair.x, chunkcoordintpair.z, Globals.Salt.GENERATE_FEATURE, 0
 +                    );
@@ -197,665 +198,374 @@ index daff5a9dd98e791b3f1dc898a082ff3e08adc92e..9effd4157b8765c7adccc84569d830d3
  
                      StructureSet.StructureSelectionEntry structureset_a1;
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java b/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java
-index 954e141e5617d6d52e2f3008c25fe9e2fe2f0f9a..3d097782a9d0f99f6dabc0a3603e1ef2207aec7d 100644
+index e6240f891e396d91e31b02fdf3084be77e9d6697..06d4013467b55bb5096f410eb1abb4bcbeb9e8a3 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java
-@@ -26,6 +26,7 @@ import net.minecraft.world.level.levelgen.GenerationStep;
- import net.minecraft.world.level.levelgen.Heightmap;
+@@ -27,6 +27,10 @@ import net.minecraft.world.level.levelgen.Heightmap;
  import net.minecraft.world.level.levelgen.blending.Blender;
- import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
-+import su.plo.matter.Globals;
+ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
  
++// Matter start
++import su.plo.matter.Globals;
++// Matter end
++
  public class ChunkStatus {
  
-@@ -268,6 +269,8 @@ public class ChunkStatus {
+     public static final int MAX_STRUCTURE_DISTANCE = 8;
+@@ -270,6 +274,7 @@ public class ChunkStatus {
      }
  
-     public CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> generate(Executor executor, ServerLevel world, ChunkGenerator generator, StructureManager structureManager, ThreadedLevelLightEngine lightingProvider, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> fullChunkConverter, List<ChunkAccess> chunks, boolean flag) {
-+        // Matter
-+        Globals.setupGlobals(world);
+     public CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> generate(Executor executor, ServerLevel world, ChunkGenerator generator, StructureTemplateManager structureTemplateManager, ThreadedLevelLightEngine lightingProvider, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> fullChunkConverter, List<ChunkAccess> chunks, boolean regenerate) {
++        Globals.setupGlobals(world); // Matter
          ChunkAccess ichunkaccess = (ChunkAccess) chunks.get(chunks.size() / 2);
          ProfiledDuration profiledduration = JvmProfiler.INSTANCE.onChunkGenerate(ichunkaccess.getPos(), world.dimension(), this.name);
-         CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> completablefuture = this.generationTask.doWork(this, executor, world, generator, structureManager, lightingProvider, fullChunkConverter, chunks, ichunkaccess, flag);
+         CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> completablefuture = this.generationTask.doWork(this, executor, world, generator, structureTemplateManager, lightingProvider, fullChunkConverter, chunks, ichunkaccess, regenerate);
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java b/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java
-index 61dc7d594c4ee15f99fd531d1b2cbaffc63c372d..f13e3eaa2aab15a983679359d40285a22dab61a2 100644
+index 503c23d15cdeaee84ab81859ceeafb0d437d2f6c..b6fd578921ad0656d51ffa1f3d065fdce628d217 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/WorldGenSettings.java
-@@ -16,6 +16,8 @@ import java.util.Optional;
- import java.util.OptionalLong;
- import java.util.Random;
- import java.util.function.Function;
+@@ -23,9 +23,21 @@ import net.minecraft.world.level.dimension.DimensionType;
+ import net.minecraft.world.level.dimension.LevelStem;
+ import org.apache.commons.lang3.StringUtils;
+ 
++// Matter start
 +import java.util.stream.LongStream;
 +
- import net.minecraft.core.Holder;
- import net.minecraft.core.MappedRegistry;
- import net.minecraft.core.Registry;
-@@ -36,16 +38,24 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
- import net.minecraft.world.level.levelgen.synth.NormalNoise;
- import org.apache.commons.lang3.StringUtils;
- import org.slf4j.Logger;
 +import su.plo.matter.Globals;
- 
++// Matter end
++
  public class WorldGenSettings {
--
--    public static final Codec<WorldGenSettings> CODEC = RecordCodecBuilder.<WorldGenSettings>create((instance) -> { // CraftBukkit - decompile error
--        return instance.group(Codec.LONG.fieldOf("seed").stable().forGetter(WorldGenSettings::seed), Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldGenSettings::generateFeatures), Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldGenSettings::generateBonusChest), RegistryCodecs.dataPackAwareCodec(Registry.LEVEL_STEM_REGISTRY, Lifecycle.stable(), LevelStem.CODEC).xmap(LevelStem::sortMap, Function.identity()).fieldOf("dimensions").forGetter(WorldGenSettings::dimensions), Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter((generatorsettings) -> {
--            return generatorsettings.legacyCustomOptions;
+-    public static final Codec<WorldGenSettings> CODEC = RecordCodecBuilder.create((instance) -> {
+-        return instance.group(Codec.LONG.fieldOf("seed").stable().forGetter(WorldGenSettings::seed), Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldGenSettings::generateStructures), Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldGenSettings::generateBonusChest), RegistryCodecs.dataPackAwareCodec(Registry.LEVEL_STEM_REGISTRY, Lifecycle.stable(), LevelStem.CODEC).xmap(LevelStem::sortMap, Function.identity()).fieldOf("dimensions").forGetter(WorldGenSettings::dimensions), Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter((worldGenSettings) -> {
++    // Matter start - Feature Secure Seed
 +    public static final Codec<WorldGenSettings> CODEC = RecordCodecBuilder.<WorldGenSettings>create((instance) -> {
 +        return instance.group(Codec.LONG.fieldOf("seed").stable().forGetter(WorldGenSettings::seed),
-+                Codec.LONG_STREAM.fieldOf("feature_seed").stable().forGetter((settings) -> LongStream.of(settings.featureSeed())), // Matter
-+                Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldGenSettings::generateFeatures),
++                Codec.LONG_STREAM.fieldOf("feature_seed").stable().forGetter((settings) -> LongStream.of(settings.featureSeed())),
++                Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldGenSettings::generateStructures),
 +                Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldGenSettings::generateBonusChest),
 +                RegistryCodecs.dataPackAwareCodec(Registry.LEVEL_STEM_REGISTRY, Lifecycle.stable(), LevelStem.CODEC).xmap(LevelStem::sortMap, Function.identity()).fieldOf("dimensions").forGetter(WorldGenSettings::dimensions),
-+                Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter((WorldGenSettings worldGenSettings) -> {
-+            return worldGenSettings.legacyCustomOptions;
++                Codec.STRING.optionalFieldOf("legacy_custom_options").stable().forGetter((worldGenSettings) -> { // Matter end
+             return worldGenSettings.legacyCustomOptions;
          })).apply(instance, instance.stable(WorldGenSettings::new));
      }).comapFlatMap(WorldGenSettings::guardExperimental, Function.identity());
-+
-     private static final Logger LOGGER = LogUtils.getLogger();
-     private final long seed;
-+    // Matter
-+    private final long[] featureSeed;
-     private final boolean generateFeatures;
-     private final boolean generateBonusChest;
+@@ -35,6 +47,9 @@ public class WorldGenSettings {
      private final Registry<LevelStem> dimensions;
-@@ -61,33 +71,38 @@ public class WorldGenSettings {
-         return LevelStem.stable(this.seed, this.dimensions);
+     private final Optional<String> legacyCustomOptions;
+ 
++    // Matter - Feature Secure Seed
++    private final long[] featureSeed;
++
+     private DataResult<WorldGenSettings> guardExperimental() {
+         LevelStem levelStem = this.dimensions.get(LevelStem.OVERWORLD);
+         if (levelStem == null) {
+@@ -48,15 +63,24 @@ public class WorldGenSettings {
+         return LevelStem.stable(this.dimensions);
      }
  
 -    public WorldGenSettings(long seed, boolean generateStructures, boolean bonusChest, Registry<LevelStem> options) {
 -        this(seed, generateStructures, bonusChest, options, Optional.empty());
--        LevelStem worlddimension = (LevelStem) options.get(LevelStem.OVERWORLD);
--
--        if (worlddimension == null) {
++    // Matter start - Feature Secure Seed
 +    public WorldGenSettings(long seed, long[] featureSeed, boolean generateStructures, boolean bonusChest, Registry<LevelStem> options) {
 +        this(seed, featureSeed, generateStructures, bonusChest, options, Optional.empty());
-+        LevelStem levelStem = options.get(LevelStem.OVERWORLD);
-+        if (levelStem == null) {
++        // Matter end - Feature Secure Seed
+         LevelStem levelStem = options.get(LevelStem.OVERWORLD);
+         if (levelStem == null) {
              throw new IllegalStateException("Overworld settings missing");
          }
      }
  
 -    private WorldGenSettings(long seed, boolean generateStructures, boolean bonusChest, Registry<LevelStem> options, Optional<String> legacyCustomOptions) {
++    // Matter start - Feature Secure Seed
 +    private WorldGenSettings(long seed, LongStream featureSeed, boolean generateStructures, boolean bonusChest, Registry<LevelStem> options, Optional<String> legacyCustomOptions) {
 +        this(seed, featureSeed.toArray(), generateStructures, bonusChest, options, legacyCustomOptions);
 +    }
 +
 +    private WorldGenSettings(long seed, long[] featureSeed, boolean generateStructures, boolean bonusChest, Registry<LevelStem> options, Optional<String> legacyCustomOptions) {
-         this.seed = seed;
 +        this.featureSeed = featureSeed;
-         this.generateFeatures = generateStructures;
++        // Matter end - Feature Secure Seed
+         this.seed = seed;
+         this.generateStructures = generateStructures;
          this.generateBonusChest = bonusChest;
-         this.dimensions = options;
-         this.legacyCustomOptions = legacyCustomOptions;
-     }
-+    // Matter end
- 
-     public static WorldGenSettings demoSettings(RegistryAccess registryManager) {
-         int i = "North Carolina".hashCode();
--
--        return new WorldGenSettings((long) i, true, true, WorldGenSettings.withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, (long) i), WorldGenSettings.makeDefaultOverworld(registryManager, (long) i)));
-+        // Matter
-+        return new WorldGenSettings((long) i, Globals.parseSeed("North Carolina").get(), true, true, WorldGenSettings.withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, (long) i), WorldGenSettings.makeDefaultOverworld(registryManager, (long) i)));
-     }
- 
-     public static WorldGenSettings makeDefault(RegistryAccess registryManager) {
-         long i = (new Random()).nextLong();
--
--        return new WorldGenSettings(i, true, false, WorldGenSettings.withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, i), WorldGenSettings.makeDefaultOverworld(registryManager, i)));
-+        // Matter
-+        return new WorldGenSettings(i, Globals.createRandomWorldSeed(), true, false, WorldGenSettings.withOverworld(registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY), DimensionType.defaultDimensions(registryManager, i), WorldGenSettings.makeDefaultOverworld(registryManager, i)));
-     }
- 
-     public static NoiseBasedChunkGenerator makeDefaultOverworld(RegistryAccess registryManager, long seed) {
-@@ -115,6 +130,12 @@ public class WorldGenSettings {
+@@ -68,6 +92,12 @@ public class WorldGenSettings {
          return this.seed;
      }
  
-+    // Matter start
++    // Matter start - Feature Secure Seed
 +    public long[] featureSeed() {
 +        return this.featureSeed;
 +    }
 +    // Matter end
 +
-     public boolean generateFeatures() {
-         return this.generateFeatures;
+     public boolean generateStructures() {
+         return this.generateStructures;
      }
-@@ -187,18 +208,23 @@ public class WorldGenSettings {
+@@ -79,7 +109,8 @@ public class WorldGenSettings {
+     public static WorldGenSettings replaceOverworldGenerator(RegistryAccess dynamicRegistryManager, WorldGenSettings generatorOptions, ChunkGenerator chunkGenerator) {
+         Registry<DimensionType> registry = dynamicRegistryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+         Registry<LevelStem> registry2 = withOverworld(registry, generatorOptions.dimensions(), chunkGenerator);
+-        return new WorldGenSettings(generatorOptions.seed(), generatorOptions.generateStructures(), generatorOptions.generateBonusChest(), registry2);
++        // Matter - Feature Secure Seed
++        return new WorldGenSettings(generatorOptions.seed(), Globals.createRandomWorldSeed(), generatorOptions.generateStructures(), generatorOptions.generateBonusChest(), registry2);
+     }
+ 
+     public static Registry<LevelStem> withOverworld(Registry<DimensionType> dimensionTypeRegistry, Registry<LevelStem> options, ChunkGenerator overworldGenerator) {
+@@ -140,19 +171,24 @@ public class WorldGenSettings {
      }
  
      public WorldGenSettings withBonusChest() {
--        return new WorldGenSettings(this.seed, this.generateFeatures, true, this.dimensions, this.legacyCustomOptions);
-+        // Matter
-+        return new WorldGenSettings(this.seed, this.featureSeed, this.generateFeatures, true, this.dimensions, this.legacyCustomOptions);
+-        return new WorldGenSettings(this.seed, this.generateStructures, true, this.dimensions, this.legacyCustomOptions);
++        // Matter - Feature Secure Seed
++        return new WorldGenSettings(this.seed, this.featureSeed, this.generateStructures, true, this.dimensions, this.legacyCustomOptions);
      }
  
-     public WorldGenSettings withFeaturesToggled() {
--        return new WorldGenSettings(this.seed, !this.generateFeatures, this.generateBonusChest, this.dimensions);
-+        // Matter
-+        return new WorldGenSettings(this.seed, this.featureSeed, !this.generateFeatures, this.generateBonusChest, this.dimensions);
+     public WorldGenSettings withStructuresToggled() {
+-        return new WorldGenSettings(this.seed, !this.generateStructures, this.generateBonusChest, this.dimensions);
++        // Matter - Feature Secure Seed
++        return new WorldGenSettings(this.seed, this.featureSeed, !this.generateStructures, this.generateBonusChest, this.dimensions);
      }
  
      public WorldGenSettings withBonusChestToggled() {
--        return new WorldGenSettings(this.seed, this.generateFeatures, !this.generateBonusChest, this.dimensions);
-+        // Matter
-+        return new WorldGenSettings(this.seed, this.featureSeed, this.generateFeatures, !this.generateBonusChest, this.dimensions);
-     }
- 
-     public static WorldGenSettings create(RegistryAccess registryManager, DedicatedServerProperties.WorldGenProperties worldGenProperties) {
-+        // Matter
-+        long[] featureSeed = Globals.parseSeed(worldGenProperties.featureSeed()).orElse(Globals.createRandomWorldSeed());
-         long i = WorldGenSettings.parseSeed(worldGenProperties.levelSeed()).orElse((new Random()).nextLong());
-         Registry<DimensionType> iregistry = registryManager.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
-         Registry<Biome> iregistry1 = registryManager.registryOrThrow(Registry.BIOME_REGISTRY);
-@@ -237,24 +263,30 @@ public class WorldGenSettings {
-                 Logger logger = WorldGenSettings.LOGGER;
- 
-                 Objects.requireNonNull(logger);
--                return new WorldGenSettings(i, flag, false, WorldGenSettings.withOverworld(iregistry, iregistry3, new FlatLevelSource(iregistry2, (FlatLevelGeneratorSettings) dataresult.resultOrPartial(s1 -> logger.error(String.valueOf(s1))).orElseGet(() -> { // CraftBukkit - decompile error
-+                // Matter
-+                return new WorldGenSettings(i, featureSeed, flag, false, WorldGenSettings.withOverworld(iregistry, iregistry3, new FlatLevelSource(iregistry2, (FlatLevelGeneratorSettings) dataresult.resultOrPartial(s1 -> logger.error(String.valueOf(s1))).orElseGet(() -> { // CraftBukkit - decompile error
-                     return FlatLevelGeneratorSettings.getDefault(iregistry1, iregistry2);
-                 }))));
-             case 1:
--                return new WorldGenSettings(i, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, new DebugLevelSource(iregistry2, iregistry1)));
-+                // Matter
-+                return new WorldGenSettings(i, featureSeed, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, new DebugLevelSource(iregistry2, iregistry1)));
-             case 2:
--                return new WorldGenSettings(i, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeOverworld(registryManager, i, NoiseGeneratorSettings.AMPLIFIED)));
-+                // Matter
-+                return new WorldGenSettings(i, featureSeed, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeOverworld(registryManager, i, NoiseGeneratorSettings.AMPLIFIED)));
-             case 3:
--                return new WorldGenSettings(i, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeOverworld(registryManager, i, NoiseGeneratorSettings.LARGE_BIOMES)));
-+                // Matter
-+                return new WorldGenSettings(i, featureSeed, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeOverworld(registryManager, i, NoiseGeneratorSettings.LARGE_BIOMES)));
-             default:
--                return new WorldGenSettings(i, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeDefaultOverworld(registryManager, i)));
-+                // Matter
-+                return new WorldGenSettings(i, featureSeed, worldGenProperties.generateStructures(), false, WorldGenSettings.withOverworld(iregistry, iregistry3, WorldGenSettings.makeDefaultOverworld(registryManager, i)));
-         }
+-        return new WorldGenSettings(this.seed, this.generateStructures, !this.generateBonusChest, this.dimensions);
++        // Matter - Feature Secure Seed
++        return new WorldGenSettings(this.seed, this.featureSeed, this.generateStructures, !this.generateBonusChest, this.dimensions);
      }
  
      public WorldGenSettings withSeed(boolean hardcore, OptionalLong seed) {
-         long i = seed.orElse(this.seed);
-         Object object;
--
-+        // Matter
+         long l = seed.orElse(this.seed);
++        // Matter - Feature Secure Seed
 +        long[] featureSeed = Globals.createRandomWorldSeed();
+         Registry<LevelStem> registry;
          if (seed.isPresent()) {
-             WritableRegistry<LevelStem> iregistrywritable = new MappedRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental(), (Function) null);
-             long j = seed.getAsLong();
-@@ -275,9 +307,9 @@ public class WorldGenSettings {
-         WorldGenSettings generatorsettings;
+             WritableRegistry<LevelStem> writableRegistry = new MappedRegistry<>(Registry.LEVEL_STEM_REGISTRY, Lifecycle.experimental(), (Function<LevelStem, Holder.Reference<LevelStem>>)null);
+@@ -169,9 +205,11 @@ public class WorldGenSettings {
  
+         WorldGenSettings worldGenSettings;
          if (this.isDebug()) {
--            generatorsettings = new WorldGenSettings(i, false, false, (Registry) object);
-+            generatorsettings = new WorldGenSettings(i, featureSeed, false, false, (Registry) object);
+-            worldGenSettings = new WorldGenSettings(l, false, false, registry);
++            // Matter - Feature Secure Seed
++            worldGenSettings = new WorldGenSettings(l, featureSeed, false, false, registry);
          } else {
--            generatorsettings = new WorldGenSettings(i, this.generateFeatures(), this.generateBonusChest() && !hardcore, (Registry) object);
-+            generatorsettings = new WorldGenSettings(i, featureSeed, this.generateFeatures(), this.generateBonusChest() && !hardcore, (Registry) object);
+-            worldGenSettings = new WorldGenSettings(l, this.generateStructures(), this.generateBonusChest() && !hardcore, registry);
++            // Matter - Feature Secure Seed
++            worldGenSettings = new WorldGenSettings(l, featureSeed, this.generateStructures(), this.generateBonusChest() && !hardcore, registry);
          }
  
-         return generatorsettings;
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
-index 8204b39496e26baf9454b117f7a5d80735956d3e..415898770c08e30dc1b0ee26119d199991432740 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/feature/BastionFeature.java
-@@ -1,14 +1,25 @@
- package net.minecraft.world.level.levelgen.feature;
- 
- import com.mojang.serialization.Codec;
-+import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.feature.configurations.JigsawConfiguration;
-+import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public class BastionFeature extends JigsawFeature {
-     private static final int BASTION_SPAWN_HEIGHT = 33;
- 
-     public BastionFeature(Codec<JigsawConfiguration> configCodec) {
--        super(configCodec, 33, false, false, (context) -> {
--            return true;
--        });
-+        super(configCodec, 33, false, false, BastionFeature::checkLocation); // Matter
-     }
-+
-+    // Matter start
-+    private static boolean checkLocation(PieceGeneratorSupplier.Context<JigsawConfiguration> context) {
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                context.chunkPos().x, context.chunkPos().z, Globals.Salt.NETHER_FORTRESS_FEATURE, 0
-+        );
-+        return worldgenRandom.nextInt(5) >= 2;
-+    }
-+    // Matter end
- }
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java
-index ff58437d0ccc4901c84b3df9afb245940fbffef1..0a5b43bbf5fbc3034a0f87da3f024ba2e12eeddc 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/feature/BuriedTreasureFeature.java
-@@ -3,13 +3,14 @@ package net.minecraft.world.level.levelgen.feature;
- import com.mojang.serialization.Codec;
- import net.minecraft.core.BlockPos;
- import net.minecraft.world.level.levelgen.Heightmap;
--import net.minecraft.world.level.levelgen.LegacyRandomSource;
- import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration;
- import net.minecraft.world.level.levelgen.structure.BuriedTreasurePieces;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
- import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public class BuriedTreasureFeature extends StructureFeature<ProbabilityFeatureConfiguration> {
-     private static final int RANDOM_SALT = 10387320;
-@@ -19,8 +20,11 @@ public class BuriedTreasureFeature extends StructureFeature<ProbabilityFeatureCo
-     }
- 
-     private static boolean checkLocation(PieceGeneratorSupplier.Context<ProbabilityFeatureConfiguration> context) {
--        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setLargeFeatureWithSalt(context.seed(), context.chunkPos().x, context.chunkPos().z, 10387320);
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                context.chunkPos().x, context.chunkPos().z, Globals.Salt.BURIED_TREASURE_FEATURE, 0
-+        );
-+        // Matter end
-         return worldgenRandom.nextFloat() < (context.config()).probability && context.validBiomeOnTop(Heightmap.Types.OCEAN_FLOOR_WG);
-     }
- 
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/ConfiguredStructureFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/ConfiguredStructureFeature.java
-index 473a54963fbe08beeff26a828827f9f72d8a29b8..29edf50911e47153affd33a6435d543a7620d1bc 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/feature/ConfiguredStructureFeature.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/feature/ConfiguredStructureFeature.java
-@@ -26,6 +26,8 @@ import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
- import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
- import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public class ConfiguredStructureFeature<FC extends FeatureConfiguration, F extends StructureFeature<FC>> {
-     public static final Codec<ConfiguredStructureFeature<?, ?>> DIRECT_CODEC = Registry.STRUCTURE_FEATURE.byNameCodec().dispatch((configuredStructureFeature) -> {
-@@ -52,8 +54,11 @@ public class ConfiguredStructureFeature<FC extends FeatureConfiguration, F exten
-         Optional<PieceGenerator<FC>> optional = this.feature.pieceGeneratorSupplier().createGenerator(new PieceGeneratorSupplier.Context<>(chunkGenerator, biomeSource, worldSeed, chunkPos, this.config, world, biomePredicate, structureManager, registryManager));
-         if (optional.isPresent()) {
-             StructurePiecesBuilder structurePiecesBuilder = new StructurePiecesBuilder();
--            WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--            worldgenRandom.setLargeFeatureSeed(worldSeed, chunkPos.x, chunkPos.z);
-+            // Matter start
-+            WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                    chunkPos.x, chunkPos.z, Globals.Salt.GENERATE_FEATURE, 0
-+            );
-+            // Matter end
-             optional.get().generatePieces(structurePiecesBuilder, new PieceGenerator.Context<>(this.config, chunkGenerator, structureManager, chunkPos, world, worldgenRandom, worldSeed));
-             StructureStart structureStart = new StructureStart(this, chunkPos, structureReferences, structurePiecesBuilder.build());
-             if (structureStart.isValid()) {
+         return worldGenSettings;
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
-index 24110d4d412b5bd0a6c17215b889ea6c02558a2c..afb23e32ed7ec4f389be09afdce758b3b967f3f3 100644
+index 512942f75552b0b068e9eebcee55ee9d0ac6e5d7..53f8db3b881a1edc6729e7b4730f2f4de3cf8ec1 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
-@@ -24,6 +24,8 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.feature.configurations.GeodeConfiguration;
+@@ -25,6 +25,11 @@ import net.minecraft.world.level.levelgen.feature.configurations.GeodeConfigurat
  import net.minecraft.world.level.levelgen.synth.NormalNoise;
  import net.minecraft.world.level.material.FluidState;
+ 
++// Matter start
 +import su.plo.matter.Globals;
 +import su.plo.matter.WorldgenCryptoRandom;
- 
++// Matter end
++
  public class GeodeFeature extends Feature<GeodeConfiguration> {
      private static final Direction[] DIRECTIONS = Direction.values();
-@@ -42,7 +44,8 @@ public class GeodeFeature extends Feature<GeodeConfiguration> {
+ 
+@@ -42,7 +47,8 @@ public class GeodeFeature extends Feature<GeodeConfiguration> {
          int j = geodeConfiguration.maxGenOffset;
          List<Pair<BlockPos, Integer>> list = Lists.newLinkedList();
-         int k = geodeConfiguration.distributionPoints.sample(random);
+         int k = geodeConfiguration.distributionPoints.sample(randomSource);
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(worldGenLevel.getSeed()));
-+        // Matter
++        // Matter - Feature Secure Seed
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(0, 0, Globals.Salt.GEODE_FEATURE, 0);
          NormalNoise normalNoise = NormalNoise.create(worldgenRandom, -4, 1.0D);
          List<BlockPos> list2 = Lists.newLinkedList();
          double d = (double)k / (double)geodeConfiguration.outerWallDistance.getMaxValue();
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java
-index 45f11284bf65081b3b2e8da85114efbe5efd5b42..6f9bd5820acf6185fdef57c6b446c1c4c2e8cb05 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/feature/MineshaftFeature.java
-@@ -1,9 +1,6 @@
- package net.minecraft.world.level.levelgen.feature;
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java b/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java
+index a2f448d3eb94bdfc99c4810cca08b56741c0b0b5..ec21a02832e88eba5d2566b557cc887006b62786 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java
+@@ -16,8 +16,13 @@ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.world.level.dimension.LevelStem;
+ import net.minecraft.world.level.levelgen.WorldGenSettings;
  
- import com.mojang.serialization.Codec;
--import java.util.Arrays;
--import java.util.Map;
--import java.util.stream.Collectors;
- import net.minecraft.core.BlockPos;
- import net.minecraft.core.QuartPos;
- import net.minecraft.util.Mth;
-@@ -12,13 +9,18 @@ import net.minecraft.world.level.block.Block;
- import net.minecraft.world.level.block.Blocks;
- import net.minecraft.world.level.block.state.BlockState;
- import net.minecraft.world.level.levelgen.Heightmap;
--import net.minecraft.world.level.levelgen.LegacyRandomSource;
- import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.feature.configurations.MineshaftConfiguration;
- import net.minecraft.world.level.levelgen.structure.MineShaftPieces;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
- import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
++// Matter start
 +import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
++// Matter end
 +
-+import java.util.Arrays;
-+import java.util.Map;
-+import java.util.stream.Collectors;
- 
- public class MineshaftFeature extends StructureFeature<MineshaftConfiguration> {
-     public MineshaftFeature(Codec<MineshaftConfiguration> configCodec) {
-@@ -26,8 +28,11 @@ public class MineshaftFeature extends StructureFeature<MineshaftConfiguration> {
+ public class WorldPreset {
+-    public static final Codec<WorldPreset> DIRECT_CODEC = RecordCodecBuilder.create((instance) -> {
++    // Matter - compile fix
++    public static final Codec<WorldPreset> DIRECT_CODEC = RecordCodecBuilder.<WorldPreset>create((instance) -> {
+         return instance.group(Codec.unboundedMap(ResourceKey.codec(Registry.LEVEL_STEM_REGISTRY), LevelStem.CODEC).fieldOf("dimensions").forGetter((preset) -> {
+             return preset.dimensions;
+         })).apply(instance, WorldPreset::new);
+@@ -42,7 +47,8 @@ public class WorldPreset {
      }
  
-     private static boolean checkLocation(PieceGeneratorSupplier.Context<MineshaftConfiguration> context) {
--        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setLargeFeatureSeed(context.seed(), context.chunkPos().x, context.chunkPos().z);
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                context.chunkPos().x, context.chunkPos().z, Globals.Salt.MINESHAFT_FEATURE, 0
-+        );
-+        // Matter end
-         double d = (double)(context.config()).probability;
-         return worldgenRandom.nextDouble() >= d ? false : context.validBiome().test(context.chunkGenerator().getNoiseBiome(QuartPos.fromBlock(context.chunkPos().getMiddleBlockX()), QuartPos.fromBlock(50), QuartPos.fromBlock(context.chunkPos().getMiddleBlockZ())));
+     public WorldGenSettings createWorldGenSettings(long seed, boolean generateStructures, boolean bonusChest) {
+-        return new WorldGenSettings(seed, generateStructures, bonusChest, this.createRegistry());
++        // Matter - Feature Secure Seed
++        return new WorldGenSettings(seed, Globals.createRandomWorldSeed(), generateStructures, bonusChest, this.createRegistry());
      }
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/NetherFortressFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/NetherFortressFeature.java
-index 8c92b50a5aaad7d70b6e4c793b9746d29d41afa4..778029daa9b2b050f2b5f35d04f7065a69cdf151 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/feature/NetherFortressFeature.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/feature/NetherFortressFeature.java
-@@ -6,12 +6,15 @@ import net.minecraft.core.QuartPos;
- import net.minecraft.util.random.WeightedRandomList;
- import net.minecraft.world.entity.EntityType;
- import net.minecraft.world.level.biome.MobSpawnSettings;
-+import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
- import net.minecraft.world.level.levelgen.structure.NetherBridgePieces;
- import net.minecraft.world.level.levelgen.structure.StructurePiece;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
+ 
+     public WorldGenSettings recreateWorldGenSettings(WorldGenSettings generatorOptions) {
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/Structure.java b/src/main/java/net/minecraft/world/level/levelgen/structure/Structure.java
+index b8649eab719a1b71dc686386a8db756eefb9802e..9508419308c82e5935a858233d04e327365c00ff 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/structure/Structure.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/structure/Structure.java
+@@ -37,6 +37,11 @@ import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
  import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
+ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
+ 
++// Matter start
 +import su.plo.matter.Globals;
 +import su.plo.matter.WorldgenCryptoRandom;
- 
- public class NetherFortressFeature extends StructureFeature<NoneFeatureConfiguration> {
-     public static final WeightedRandomList<MobSpawnSettings.SpawnerData> FORTRESS_ENEMIES = WeightedRandomList.create(new MobSpawnSettings.SpawnerData(EntityType.BLAZE, 10, 2, 3), new MobSpawnSettings.SpawnerData(EntityType.ZOMBIFIED_PIGLIN, 5, 4, 4), new MobSpawnSettings.SpawnerData(EntityType.WITHER_SKELETON, 8, 5, 5), new MobSpawnSettings.SpawnerData(EntityType.SKELETON, 2, 5, 5), new MobSpawnSettings.SpawnerData(EntityType.MAGMA_CUBE, 3, 4, 4));
-@@ -21,7 +24,12 @@ public class NetherFortressFeature extends StructureFeature<NoneFeatureConfigura
-     }
- 
-     private static boolean checkLocation(PieceGeneratorSupplier.Context<NoneFeatureConfiguration> context) {
--        return context.validBiome().test(context.chunkGenerator().getNoiseBiome(QuartPos.fromBlock(context.chunkPos().getMiddleBlockX()), QuartPos.fromBlock(64), QuartPos.fromBlock(context.chunkPos().getMiddleBlockZ())));
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                context.chunkPos().x, context.chunkPos().z, Globals.Salt.NETHER_FORTRESS_FEATURE, 0
-+        );
-+        return worldgenRandom.nextInt(5) >= 2 ? false : context.validBiome().test(context.chunkGenerator().getNoiseBiome(QuartPos.fromBlock(context.chunkPos().getMiddleBlockX()), QuartPos.fromBlock(64), QuartPos.fromBlock(context.chunkPos().getMiddleBlockZ())));
-+        // Matter end
-     }
- 
-     private static void generatePieces(StructurePiecesBuilder collector, PieceGenerator.Context<NoneFeatureConfiguration> context) {
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/OceanMonumentFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/OceanMonumentFeature.java
-index 3e5a6afa03e659c14105d95194e2e4fa52feb841..41b35e4d63471ad8bdffdae71d0d4038f2ac6139 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/feature/OceanMonumentFeature.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/feature/OceanMonumentFeature.java
-@@ -1,14 +1,11 @@
- package net.minecraft.world.level.levelgen.feature;
- 
- import com.mojang.serialization.Codec;
--import java.util.Objects;
- import net.minecraft.core.Direction;
- import net.minecraft.core.Holder;
- import net.minecraft.world.level.ChunkPos;
- import net.minecraft.world.level.biome.Biome;
- import net.minecraft.world.level.levelgen.Heightmap;
--import net.minecraft.world.level.levelgen.LegacyRandomSource;
--import net.minecraft.world.level.levelgen.RandomSupport;
- import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
- import net.minecraft.world.level.levelgen.structure.BoundingBox;
-@@ -18,6 +15,10 @@ import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
- import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
- import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
++// Matter end
 +
-+import java.util.Objects;
+ public abstract class Structure {
+     public static final Codec<Structure> DIRECT_CODEC = Registry.STRUCTURE_TYPES.byNameCodec().dispatch(Structure::type, StructureType::codec);
+     public static final Codec<Holder<Structure>> CODEC = RegistryFileCodec.create(Registry.STRUCTURE_REGISTRY, DIRECT_CODEC);
+@@ -157,9 +162,11 @@ public abstract class Structure {
+         }
  
- public class OceanMonumentFeature extends StructureFeature<NoneFeatureConfiguration> {
-     public OceanMonumentFeature(Codec<NoneFeatureConfiguration> configCodec) {
-@@ -52,7 +53,11 @@ public class OceanMonumentFeature extends StructureFeature<NoneFeatureConfigurat
-         if (pieces.isEmpty()) {
-             return pieces;
-         } else {
--            WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(RandomSupport.seedUniquifier()));
-+            // Matter start
-+            WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                    pos.x, pos.z, Globals.Salt.OCEAN_MONUMENT_FEATURE, 0
+         private static WorldgenRandom makeRandom(long seed, ChunkPos chunkPos) {
+-            WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
+-            worldgenRandom.setLargeFeatureSeed(seed, chunkPos.x, chunkPos.z);
+-            return worldgenRandom;
++            // Matter start - Feature Secure Seed
++            return new WorldgenCryptoRandom(
++                    chunkPos.x, chunkPos.z, Globals.Salt.GENERATE_FEATURE, seed
 +            );
 +            // Matter end
-             worldgenRandom.setLargeFeatureSeed(worldSeed, pos.x, pos.z);
-             StructurePiece structurePiece = pieces.pieces().get(0);
-             BoundingBox boundingBox = structurePiece.getBoundingBox();
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/PillagerOutpostFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/PillagerOutpostFeature.java
-index 043233f496ce7e03aa3977f9f8c165924ff0da5f..42493f2a380552ab009238fc7d5f8a476d7690d6 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/feature/PillagerOutpostFeature.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/feature/PillagerOutpostFeature.java
-@@ -2,11 +2,12 @@ package net.minecraft.world.level.levelgen.feature;
+         }
+     }
  
- import com.mojang.serialization.Codec;
- import net.minecraft.world.level.ChunkPos;
--import net.minecraft.world.level.levelgen.LegacyRandomSource;
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
+index 638e2c868342ae133717936487d4048cde2fafc0..26f9afc05f843addaf05e7df9329b8d075f11321 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
+@@ -11,8 +11,13 @@ import net.minecraft.world.level.levelgen.LegacyRandomSource;
+ import net.minecraft.world.level.levelgen.RandomState;
  import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.feature.configurations.JigsawConfiguration;
- import net.minecraft.world.level.levelgen.structure.BuiltinStructureSets;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
+ 
++// Matter start
++import su.plo.matter.Globals;
++import su.plo.matter.WorldgenCryptoRandom;
++// Matter end
++
+ public class RandomSpreadStructurePlacement extends StructurePlacement {
+-    public static final Codec<RandomSpreadStructurePlacement> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
++    public static final Codec<RandomSpreadStructurePlacement> CODEC = RecordCodecBuilder.<RandomSpreadStructurePlacement>mapCodec((instance) -> { // Matter - compile fix
+         return placementCodec(instance).and(instance.group(Codec.intRange(0, 4096).fieldOf("spacing").forGetter(RandomSpreadStructurePlacement::spacing), Codec.intRange(0, 4096).fieldOf("separation").forGetter(RandomSpreadStructurePlacement::separation), RandomSpreadType.CODEC.optionalFieldOf("spread_type", RandomSpreadType.LINEAR).forGetter(RandomSpreadStructurePlacement::spreadType))).apply(instance, RandomSpreadStructurePlacement::new);
+     }).flatXmap((placement) -> {
+         return placement.spacing <= placement.separation ? DataResult.error("Spacing has to be larger than separation") : DataResult.success(placement);
+@@ -47,8 +52,11 @@ public class RandomSpreadStructurePlacement extends StructurePlacement {
+     public ChunkPos getPotentialStructureChunk(long seed, int x, int z) {
+         int i = Math.floorDiv(x, this.spacing);
+         int j = Math.floorDiv(z, this.spacing);
+-        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
+-        worldgenRandom.setLargeFeatureWithSalt(seed, i, j, this.salt());
++        // Matter start
++        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
++                i, j, Globals.Salt.POTENTIONAL_FEATURE, this.salt
++        );
++        // Matter end
+         int k = this.spacing - this.separation;
+         int l = this.spreadType.evaluate(worldgenRandom, k);
+         int m = this.spreadType.evaluate(worldgenRandom, k);
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
+index df4ef6c9dd5747f7d8eebeff149bcfab96832864..10c9308537a2e7ae9b466712863b1eaa6b066f02 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
+@@ -17,6 +17,8 @@ import net.minecraft.world.level.levelgen.LegacyRandomSource;
+ import net.minecraft.world.level.levelgen.RandomState;
+ import net.minecraft.world.level.levelgen.WorldgenRandom;
+ import net.minecraft.world.level.levelgen.structure.StructureSet;
 +import su.plo.matter.Globals;
 +import su.plo.matter.WorldgenCryptoRandom;
  
- public class PillagerOutpostFeature extends JigsawFeature {
-     public PillagerOutpostFeature(Codec<JigsawConfiguration> configCodec) {
-@@ -17,8 +18,11 @@ public class PillagerOutpostFeature extends JigsawFeature {
-         ChunkPos chunkPos = context.chunkPos();
-         int i = chunkPos.x >> 4;
-         int j = chunkPos.z >> 4;
+ public abstract class StructurePlacement {
+     public static final Codec<StructurePlacement> CODEC = Registry.STRUCTURE_PLACEMENT_TYPE.byNameCodec().dispatch(StructurePlacement::type, StructurePlacementType::codec);
+@@ -78,32 +80,43 @@ public abstract class StructurePlacement {
+     public abstract StructurePlacementType<?> type();
+ 
+     private static boolean probabilityReducer(long seed, int regionX, int regionZ, int salt, float frequency) {
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setSeed((long)(i ^ j << 4) ^ context.seed());
-+        // Matter
+-        worldgenRandom.setLargeFeatureWithSalt(seed, regionX, regionZ, salt);
++        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                i, j, Globals.Salt.PILLAGER_OUTPOST_FEATURE, 0
++                regionX, regionZ, Globals.Salt.UNDEFINED, salt
++        );
++        // Matter end
+         return worldgenRandom.nextFloat() < frequency;
+     }
+ 
+     private static boolean legacyProbabilityReducerWithDouble(long seed, int i, int chunkX, int chunkZ, float frequency) {
+-        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
+-        worldgenRandom.setLargeFeatureSeed(seed, chunkX, chunkZ);
++        // Matter start
++        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
++                chunkX, chunkZ, Globals.Salt.MINESHAFT_FEATURE, 0
++        );
++        // Matter end
+         return worldgenRandom.nextDouble() < (double)frequency;
+     }
+ 
+     private static boolean legacyArbitrarySaltProbabilityReducer(long seed, int i, int regionX, int regionZ, float frequency) {
+-        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
+-        worldgenRandom.setLargeFeatureWithSalt(seed, regionX, regionZ, 10387320);
++        // Matter start
++        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
++                regionX, regionZ, Globals.Salt.BURIED_TREASURE_FEATURE, 0
++        );
++        // Matter end
+         return worldgenRandom.nextFloat() < frequency;
+     }
+ 
+     private static boolean legacyPillagerOutpostReducer(long seed, int i, int j, int k, float frequency) {
+         int l = j >> 4;
+         int m = k >> 4;
+-        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
+-        worldgenRandom.setSeed((long)(l ^ m << 4) ^ seed);
++        // Matter - Secure Feature Seed
++        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
++                l, m, Globals.Salt.PILLAGER_OUTPOST_FEATURE, 0
 +        );
 +        // Matter end
          worldgenRandom.nextInt();
-         if (worldgenRandom.nextInt(5) != 0) {
-             return false;
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/RuinedPortalFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/RuinedPortalFeature.java
-index 75e6ee90137e17ffc25fcf987df93ccba14add02..b6f178f4aa9317b5826a06ad0a42b63eb67bd2cc 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/feature/RuinedPortalFeature.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/feature/RuinedPortalFeature.java
-@@ -2,12 +2,6 @@ package net.minecraft.world.level.levelgen.feature;
- 
- import com.google.common.collect.ImmutableList;
- import com.mojang.serialization.Codec;
--import java.util.Arrays;
--import java.util.List;
--import java.util.Map;
--import java.util.Optional;
--import java.util.Random;
--import java.util.stream.Collectors;
- import net.minecraft.Util;
- import net.minecraft.core.BlockPos;
- import net.minecraft.core.Holder;
-@@ -23,7 +17,6 @@ import net.minecraft.world.level.block.Rotation;
- import net.minecraft.world.level.block.state.BlockState;
- import net.minecraft.world.level.chunk.ChunkGenerator;
- import net.minecraft.world.level.levelgen.Heightmap;
--import net.minecraft.world.level.levelgen.LegacyRandomSource;
- import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.feature.configurations.RuinedPortalConfiguration;
- import net.minecraft.world.level.levelgen.structure.BoundingBox;
-@@ -31,6 +24,11 @@ import net.minecraft.world.level.levelgen.structure.RuinedPortalPiece;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
- import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
-+
-+import java.util.*;
-+import java.util.stream.Collectors;
- 
- public class RuinedPortalFeature extends StructureFeature<RuinedPortalConfiguration> {
-     private static final String[] STRUCTURE_LOCATION_PORTALS = new String[]{"ruined_portal/portal_1", "ruined_portal/portal_2", "ruined_portal/portal_3", "ruined_portal/portal_4", "ruined_portal/portal_5", "ruined_portal/portal_6", "ruined_portal/portal_7", "ruined_portal/portal_8", "ruined_portal/portal_9", "ruined_portal/portal_10"};
-@@ -50,8 +48,11 @@ public class RuinedPortalFeature extends StructureFeature<RuinedPortalConfigurat
-     private static Optional<PieceGenerator<RuinedPortalConfiguration>> pieceGeneratorSupplier(PieceGeneratorSupplier.Context<RuinedPortalConfiguration> context) {
-         RuinedPortalPiece.Properties properties = new RuinedPortalPiece.Properties();
-         RuinedPortalConfiguration ruinedPortalConfiguration = context.config();
--        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setLargeFeatureSeed(context.seed(), context.chunkPos().x, context.chunkPos().z);
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                context.chunkPos().x, context.chunkPos().z, Globals.Salt.RUINED_PORTAL_FEATURE, 0
-+        );
-+        // Matter end
-         RuinedPortalPiece.VerticalPlacement verticalPlacement;
-         if (ruinedPortalConfiguration.portalType == RuinedPortalFeature.Type.DESERT) {
-             verticalPlacement = RuinedPortalPiece.VerticalPlacement.PARTLY_BURIED;
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/WoodlandMansionFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/WoodlandMansionFeature.java
-index 3607b5b63b28591e2bfb6ee760df29bf8dab0ae8..0470afa1cfd2191f64698c19967ae53dd2117461 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/feature/WoodlandMansionFeature.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/feature/WoodlandMansionFeature.java
-@@ -2,9 +2,6 @@ package net.minecraft.world.level.levelgen.feature;
- 
- import com.google.common.collect.Lists;
- import com.mojang.serialization.Codec;
--import java.util.List;
--import java.util.Optional;
--import java.util.Random;
- import net.minecraft.core.BlockPos;
- import net.minecraft.core.QuartPos;
- import net.minecraft.world.level.ChunkPos;
-@@ -13,7 +10,6 @@ import net.minecraft.world.level.WorldGenLevel;
- import net.minecraft.world.level.block.Blocks;
- import net.minecraft.world.level.block.Rotation;
- import net.minecraft.world.level.chunk.ChunkGenerator;
--import net.minecraft.world.level.levelgen.LegacyRandomSource;
- import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
- import net.minecraft.world.level.levelgen.structure.BoundingBox;
-@@ -21,6 +17,12 @@ import net.minecraft.world.level.levelgen.structure.WoodlandMansionPieces;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
- import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
-+
-+import java.util.List;
-+import java.util.Optional;
-+import java.util.Random;
- 
- public class WoodlandMansionFeature extends StructureFeature<NoneFeatureConfiguration> {
-     public WoodlandMansionFeature(Codec<NoneFeatureConfiguration> configCodec) {
-@@ -28,8 +30,11 @@ public class WoodlandMansionFeature extends StructureFeature<NoneFeatureConfigur
+         return worldgenRandom.nextInt((int)(1.0F / frequency)) == 0;
      }
- 
-     private static Optional<PieceGenerator<NoneFeatureConfiguration>> pieceGeneratorSupplier(PieceGeneratorSupplier.Context<NoneFeatureConfiguration> context) {
--        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setLargeFeatureSeed(context.seed(), context.chunkPos().x, context.chunkPos().z);
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                context.chunkPos().x, context.chunkPos().z, Globals.Salt.WOODLAND_MANSION_FEATURE, 0
-+        );
-+        // Matter end
-         Rotation rotation = Rotation.getRandom(worldgenRandom);
-         int i = 5;
-         int j = 5;
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/NetherFossilFeature.java b/src/main/java/net/minecraft/world/level/levelgen/structure/NetherFossilFeature.java
-index fc6ea073dda463a0d0fcdc2c40b1b6ef2339c6af..0fc9e49f314c963556474eda9d153b238bb9729a 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/structure/NetherFossilFeature.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/structure/NetherFossilFeature.java
-@@ -16,6 +16,8 @@ import net.minecraft.world.level.levelgen.feature.StructureFeature;
- import net.minecraft.world.level.levelgen.feature.configurations.RangeConfiguration;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
- import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public class NetherFossilFeature extends StructureFeature<RangeConfiguration> {
-     public NetherFossilFeature(Codec<RangeConfiguration> configCodec) {
-@@ -23,8 +25,11 @@ public class NetherFossilFeature extends StructureFeature<RangeConfiguration> {
-     }
- 
-     private static Optional<PieceGenerator<RangeConfiguration>> pieceGeneratorSupplier(PieceGeneratorSupplier.Context<RangeConfiguration> context) {
--        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setLargeFeatureSeed(context.seed(), context.chunkPos().x, context.chunkPos().z);
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                context.chunkPos().x, context.chunkPos().z, Globals.Salt.NETHER_FOSSIL_FEATURE, 0
-+        );
-+        // Matter end
-         int i = context.chunkPos().getMinBlockX() + worldgenRandom.nextInt(16);
-         int j = context.chunkPos().getMinBlockZ() + worldgenRandom.nextInt(16);
-         int k = context.chunkGenerator().getSeaLevel();
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
-index 42152827c5b1393c9b7efa88017435716eb585c0..5c528eb1ecaa7c21a131f8c5258c142b06d83bc7 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
-@@ -9,9 +9,12 @@ import net.minecraft.world.level.ChunkPos;
- import net.minecraft.world.level.chunk.ChunkGenerator;
- import net.minecraft.world.level.levelgen.LegacyRandomSource;
- import net.minecraft.world.level.levelgen.WorldgenRandom;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public record RandomSpreadStructurePlacement(int spacing, int separation, RandomSpreadType spreadType, int salt, Vec3i locateOffset) implements StructurePlacement {
--    public static final Codec<RandomSpreadStructurePlacement> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-+    // Matter - compile fix
-+    public static final Codec<RandomSpreadStructurePlacement> CODEC = RecordCodecBuilder.<RandomSpreadStructurePlacement>mapCodec((instance) -> {
-         return instance.group(Codec.intRange(0, 4096).fieldOf("spacing").forGetter(RandomSpreadStructurePlacement::spacing), Codec.intRange(0, 4096).fieldOf("separation").forGetter(RandomSpreadStructurePlacement::separation), RandomSpreadType.CODEC.optionalFieldOf("spread_type", RandomSpreadType.LINEAR).forGetter(RandomSpreadStructurePlacement::spreadType), ExtraCodecs.NON_NEGATIVE_INT.fieldOf("salt").forGetter(RandomSpreadStructurePlacement::salt), Vec3i.offsetCodec(16).optionalFieldOf("locate_offset", Vec3i.ZERO).forGetter(RandomSpreadStructurePlacement::locateOffset)).apply(instance, RandomSpreadStructurePlacement::new);
-     }).flatXmap((placement) -> {
-         return placement.spacing <= placement.separation ? DataResult.error("Spacing has to be larger than separation") : DataResult.success(placement);
-@@ -26,8 +29,11 @@ public record RandomSpreadStructurePlacement(int spacing, int separation, Random
-         int j = this.separation();
-         int k = Math.floorDiv(x, i);
-         int l = Math.floorDiv(z, i);
--        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setLargeFeatureWithSalt(seed, k, l, this.salt());
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                k, l, Globals.Salt.POTENTIONAL_FEATURE, this.salt
-+        );
-+        // Matter end
-         int m = i - j;
-         int n = this.spreadType().evaluate(worldgenRandom, m);
-         int o = this.spreadType().evaluate(worldgenRandom, m);
+-
+     /** @deprecated */
+     @Deprecated
+     public static record ExclusionZone(Holder<StructureSet> otherSet, int chunkCount) {
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/pools/JigsawPlacement.java b/src/main/java/net/minecraft/world/level/levelgen/structure/pools/JigsawPlacement.java
-index 67a5481a203bb27e1b4236facda4fb30abc2daf7..4c011c9f2ddd8e6b9cf697dd4b23181199065927 100644
+index 33a886cd55bb6af2e4b8fcc6bb05465ee3fe4186..f058feee1b62ba20102e6d3ff0eac1df7e07c7c0 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/structure/pools/JigsawPlacement.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/structure/pools/JigsawPlacement.java
-@@ -39,13 +39,18 @@ import net.minecraft.world.phys.shapes.Shapes;
- import net.minecraft.world.phys.shapes.VoxelShape;
+@@ -40,6 +40,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  import org.apache.commons.lang3.mutable.MutableObject;
  import org.slf4j.Logger;
+ 
++// Matter start
 +import su.plo.matter.Globals;
 +import su.plo.matter.WorldgenCryptoRandom;
- 
++// Matter end
++
  public class JigsawPlacement {
      static final Logger LOGGER = LogUtils.getLogger();
  
-     public static Optional<PieceGenerator<JigsawConfiguration>> addPieces(PieceGeneratorSupplier.Context<JigsawConfiguration> context, JigsawPlacement.PieceFactory pieceFactory, BlockPos pos, boolean bl, boolean bl2) {
--        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setLargeFeatureSeed(context.seed(), context.chunkPos().x, context.chunkPos().z);
+@@ -48,7 +53,11 @@ public class JigsawPlacement {
+         ChunkGenerator chunkGenerator = context.chunkGenerator();
+         StructureTemplateManager structureTemplateManager = context.structureTemplateManager();
+         LevelHeightAccessor levelHeightAccessor = context.heightAccessor();
+-        WorldgenRandom worldgenRandom = context.random();
 +        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
 +                context.chunkPos().x, context.chunkPos().z, Globals.Salt.JIGSAW_PLACEMENT, 0
 +        );
 +        // Matter end
-         RegistryAccess registryAccess = context.registryAccess();
-         JigsawConfiguration jigsawConfiguration = context.config();
-         ChunkGenerator chunkGenerator = context.chunkGenerator();
-@@ -200,18 +205,20 @@ public class JigsawPlacement {
+         Registry<StructureTemplatePool> registry = registryAccess.registryOrThrow(Registry.TEMPLATE_POOL_REGISTRY);
+         Rotation rotation = Rotation.getRandom(worldgenRandom);
+         StructureTemplatePool structureTemplatePool = structurePool.value();
+@@ -235,18 +244,21 @@ public class JigsawPlacement {
                                          if (!boundingBox2.isInside(structureBlockInfox.pos.relative(JigsawBlock.getFrontFacing(structureBlockInfox.state)))) {
                                              return 0;
                                          } else {
@@ -869,37 +579,63 @@ index 67a5481a203bb27e1b4236facda4fb30abc2daf7..4c011c9f2ddd8e6b9cf697dd4b231811
                                                  return this.pools.getOptional(pool.getFallback());
                                              });
 -                                            int i = optional.map((pool) -> {
++
 +                                            int i1 = pool1.map((pool) -> {
-                                                 return pool.getMaxSize(this.structureManager);
+                                                 return pool.getMaxSize(this.structureTemplateManager);
                                              }).orElse(0);
 -                                            int j = optional2.map((pool) -> {
 +                                            int j1 = pool2.map((pool) -> {
-                                                 return pool.getMaxSize(this.structureManager);
+                                                 return pool.getMaxSize(this.structureTemplateManager);
                                              }).orElse(0);
 -                                            return Math.max(i, j);
-+                                            // Mater end - compile fix
 +                                            return Math.max(i1, j1);
++                                            // Mater end - compile fix
                                          }
                                      }).max().orElse(0);
                                  } else {
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/structures/EndCityStructure.java b/src/main/java/net/minecraft/world/level/levelgen/structure/structures/EndCityStructure.java
+index 2d4a14e8c3f876186c417b9e4284a95f65cf9cd5..991010f818dcb26581a09341201087379b52ee04 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/structure/structures/EndCityStructure.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/structure/structures/EndCityStructure.java
+@@ -10,6 +10,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
+ import net.minecraft.world.level.levelgen.structure.StructurePiece;
+ import net.minecraft.world.level.levelgen.structure.StructureType;
+ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
++import su.plo.matter.WorldgenCryptoRandom;
+ 
+ public class EndCityStructure extends Structure {
+     public static final Codec<EndCityStructure> CODEC = simpleCodec(EndCityStructure::new);
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java b/src/main/java/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java
+index 36cd894c3a9261d6c3bda7178f4b4d4f1045bd11..e9cade3b86f6e24c6fa2064d6bbb92b322e640c8 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java
+@@ -17,6 +17,7 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
+ import net.minecraft.world.level.levelgen.structure.Structure;
+ import net.minecraft.world.level.levelgen.structure.StructureType;
+ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
++import su.plo.matter.WorldgenCryptoRandom;
+ 
+ public class MineshaftStructure extends Structure {
+     public static final Codec<MineshaftStructure> CODEC = RecordCodecBuilder.create((instance) -> {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index 403aba29347c779da75337531c3723632120e7c9..e4a468003744e6299d4a5c17af9d7fa39cd31745 100644
+index 947b0b10fb965f30513fd0df5bc0910fb9cb9a71..05d7e197da45579a28ef0180d6f43a5ab1da794f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-@@ -206,7 +206,7 @@ public class CraftChunk implements Chunk {
+@@ -207,7 +207,8 @@ public class CraftChunk implements Chunk {
      @Override
      public boolean isSlimeChunk() {
          // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
--        return this.worldServer.paperConfig.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
-+        return worldServer.getChunk(this.getX(), this.getZ()).isSlimeChunk(); // Matter
+-        return this.worldServer.paperConfig().entities.spawning.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
++        // Matter - Feature Secure Seed
++        return this.worldServer.paperConfig().entities.spawning.allChunksAreSlimeChunks ||worldServer.getChunk(this.getX(), this.getZ()).isSlimeChunk();
      }
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index f4a82b1f2dc26f938d3dcb23ec32f135a1bfd163..07f082514a28118c5ab49ca68560f7e838abf3ea 100644
+index 7899ae5e60ee2b30c6d4d7056c59bb38cc05b7c8..c8ce729ea50ed2f4bdd2cafdadb7278cfef1f5a2 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -244,6 +244,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
+@@ -238,6 +238,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
  import org.yaml.snakeyaml.error.MarkedYAMLException;
  
  import net.md_5.bungee.api.chat.BaseComponent; // Spigot
@@ -915,7 +651,7 @@ index f4a82b1f2dc26f938d3dcb23ec32f135a1bfd163..07f082514a28118c5ab49ca68560f7e8
 +            // Matter
 +            DedicatedServerProperties.WorldGenProperties properties = new DedicatedServerProperties.WorldGenProperties(Objects.toString(creator.seed()), Globals.seedToString(Globals.createRandomWorldSeed()), GsonHelper.parse((creator.generatorSettings().isEmpty()) ? "{}" : creator.generatorSettings()), creator.generateStructures(), creator.type().name().toLowerCase(Locale.ROOT));
  
-             WorldGenSettings generatorsettings = WorldGenSettings.create(this.console.registryAccess(), properties);
+             WorldGenSettings generatorsettings = properties.create(this.console.registryAccess());
              worldSettings = new LevelSettings(name, GameType.byId(this.getDefaultGameMode().getValue()), hardcore, Difficulty.EASY, false, new GameRules(), console.datapackconfiguration);
 diff --git a/src/main/java/su/plo/matter/Globals.java b/src/main/java/su/plo/matter/Globals.java
 new file mode 100644
@@ -1092,20 +828,18 @@ index 0000000000000000000000000000000000000000..d18b15ca0b6585f08b30b019c8c17a0f
 +}
 diff --git a/src/main/java/su/plo/matter/WorldgenCryptoRandom.java b/src/main/java/su/plo/matter/WorldgenCryptoRandom.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..56a1dccabd29543199fb0eca772fd3ad3ef7104a
+index 0000000000000000000000000000000000000000..1d76b84a4d9eeeb975efe9d7ba2440d31ab41ce7
 --- /dev/null
 +++ b/src/main/java/su/plo/matter/WorldgenCryptoRandom.java
-@@ -0,0 +1,142 @@
+@@ -0,0 +1,140 @@
 +package su.plo.matter;
 +
 +import net.minecraft.util.Mth;
++import net.minecraft.util.RandomSource;
 +import net.minecraft.world.level.levelgen.LegacyRandomSource;
-+import net.minecraft.world.level.levelgen.PositionalRandomFactory;
-+import net.minecraft.world.level.levelgen.RandomSource;
 +import net.minecraft.world.level.levelgen.WorldgenRandom;
 +
 +import java.util.Arrays;
-+import java.util.Random;
 +
 +public class WorldgenCryptoRandom extends WorldgenRandom {
 +    // hash the world seed to guard against badly chosen world seeds
@@ -1234,7 +968,7 @@ index 0000000000000000000000000000000000000000..56a1dccabd29543199fb0eca772fd3ad
 +        super.setLargeFeatureWithSalt(worldSeed, regionX, regionZ, salt);
 +    }
 +
-+    public static Random seedSlimeChunk(int chunkX, int chunkZ) {
++    public static RandomSource seedSlimeChunk(int chunkX, int chunkZ) {
 +        return new WorldgenCryptoRandom(chunkX, chunkZ, Globals.Salt.SLIME_CHUNK, 0);
 +    }
 +}

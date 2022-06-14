@@ -5,37 +5,52 @@ Subject: [PATCH] Seed Command
 
 
 diff --git a/src/main/java/net/minecraft/server/commands/SeedCommand.java b/src/main/java/net/minecraft/server/commands/SeedCommand.java
-index 6f4aa3fce42a53883db1485731e03822887cadc0..84dd717767bcf04c56b26bc872d4f05352c30a8f 100644
+index 621b6f2072d1299855419f1b21dd4d1ea456282a..ba0fa148364744e55ab58128873d9eef09c20d56 100644
 --- a/src/main/java/net/minecraft/server/commands/SeedCommand.java
 +++ b/src/main/java/net/minecraft/server/commands/SeedCommand.java
-@@ -10,6 +10,7 @@ import net.minecraft.network.chat.ComponentUtils;
+@@ -9,16 +9,31 @@ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.chat.ComponentUtils;
  import net.minecraft.network.chat.HoverEvent;
- import net.minecraft.network.chat.TextComponent;
- import net.minecraft.network.chat.TranslatableComponent;
-+import su.plo.matter.Globals;
  
++// Matter start
++import su.plo.matter.Globals;
++// Matter end
++
  public class SeedCommand {
      public static void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
-@@ -20,8 +21,21 @@ public class SeedCommand {
-             Component component = ComponentUtils.wrapInSquareBrackets((new TextComponent(String.valueOf(l))).withStyle((style) -> {
-                 return style.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(l))).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("chat.copy.click"))).withInsertion(String.valueOf(l));
-             }));
-+
-+            // Matter start
+         dispatcher.register(Commands.literal("seed").requires((source) -> {
+             return !dedicated || source.hasPermission(2);
+         }).executes((context) -> {
+             long l = context.getSource().getLevel().getSeed();
+-            Component component = ComponentUtils.wrapInSquareBrackets(Component.literal(String.valueOf(l)).withStyle((style) -> {
++            // Matter start - Seed Command
 +            Globals.setupGlobals(context.getSource().getLevel());
 +            String seedStr = Globals.seedToString(Globals.worldSeed);
-+            Component result = ComponentUtils.wrapInSquareBrackets(new TranslatableComponent("chat.copy.click")).withStyle(style -> {
-+                return style.withColor(ChatFormatting.GREEN)
-+                        .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, seedStr))
-+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("chat.copy.click")))
-+                        .withInsertion(seedStr);
-+            });
 +
-             context.getSource().sendSuccess(new TranslatableComponent("commands.seed.success", component), false);
--            return (int)l;
-+            context.getSource().sendSuccess(new TranslatableComponent("Feature seed: %s", result), false);
++            Component seedComponent = ComponentUtils.wrapInSquareBrackets(Component.literal(String.valueOf(l)).withStyle((style) -> {
+                 return style.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(l))).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click"))).withInsertion(String.valueOf(l));
+             }));
+-            context.getSource().sendSuccess(Component.translatable("commands.seed.success", component), false);
++
++            Component featureSeedComponent = ComponentUtils.wrapInSquareBrackets(Component.translatable("chat.copy.click").withStyle((style) -> {
++                return style.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, seedStr)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click"))).withInsertion(seedStr);
++            }));
++
++            context.getSource().sendSuccess(Component.translatable("commands.seed.success", seedComponent), false);
++            context.getSource().sendSuccess(Component.translatable("Feature seed: %s", featureSeedComponent), false);
 +            // Matter end
-+            return (int) l;
+             return (int)l;
          }));
      }
- }
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java b/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java
+index ec21a02832e88eba5d2566b557cc887006b62786..e470047a1c63c48b4c27d2511a6974512748c924 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java
+@@ -15,6 +15,7 @@ import net.minecraft.resources.RegistryFileCodec;
+ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.world.level.dimension.LevelStem;
+ import net.minecraft.world.level.levelgen.WorldGenSettings;
++import su.plo.matter.Globals;
+ 
+ // Matter start
+ import su.plo.matter.Globals;
