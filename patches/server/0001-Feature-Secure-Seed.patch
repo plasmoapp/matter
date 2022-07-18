@@ -57,7 +57,7 @@ index 378cc1f9e19eb9b18037ab8af92f65897e15a405..33cb2fc823624b40a32c6f5513abb073
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index d0cfbaf3fd5573f33ad3afc47a35157c0da5233a..2b6d13c7a8ba48b452165e2eedeeeeb809d012ff 100644
+index 32a39a150a3d2bbae95a726901f3f46363e34ecf..eb1473e5cc9b086c1a8be23ced6d0915dbde49de 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -170,6 +170,10 @@ import org.bukkit.event.world.TimeSkipEvent;
@@ -93,7 +93,7 @@ index 7e85ad7ba31bbb32ea1e1dff5d1c83e7ce68b4b3..94a1868843407d421e6aa3b7719cff67
              // Paper start - Replace rules for Height in Slime Chunks
              final double maxHeightSlimeChunk = world.getMinecraftWorld().paperConfig().entities.spawning.slimeSpawnHeight.slimeChunk.maximum;
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-index 8d7d10f620b30c35d2ef580ea914f2c62054a785..c06ee8618b58806e7114f0c253dcc48e4386bf14 100644
+index c15cedaca3a3dc921ac758580b165d28ee3a945f..e744f5e7ca754dfe1dbfef61ddc69d7a76e0900c 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
 @@ -50,6 +50,7 @@ import net.minecraft.world.level.material.Fluid;
@@ -116,9 +116,9 @@ index 8d7d10f620b30c35d2ef580ea914f2c62054a785..c06ee8618b58806e7114f0c253dcc48e
      // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
      private static final org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry();
      public org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer persistentDataContainer = new org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer(ChunkAccess.DATA_TYPE_REGISTRY);
-@@ -147,6 +153,17 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
-     public final Registry<Biome> biomeRegistry;
-     // CraftBukkit end
+@@ -158,6 +164,17 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
+ 
+     }
  
 +    // Matter start
 +    public boolean isSlimeChunk() {
@@ -131,9 +131,9 @@ index 8d7d10f620b30c35d2ef580ea914f2c62054a785..c06ee8618b58806e7114f0c253dcc48e
 +    }
 +    // Matter end
 +
-     private static void replaceMissingSections(LevelHeightAccessor world, Registry<Biome> biome, LevelChunkSection[] sectionArray) {
-         for (int i = 0; i < sectionArray.length; ++i) {
-             if (sectionArray[i] == null) {
+     public GameEventDispatcher getEventDispatcher(int ySectionCoord) {
+         return GameEventDispatcher.NOOP;
+     }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 index 264ca51c2f2a5ff69688372b71ad7355366bac1a..bd7db5094a6cba22868678c223870ba201aa43e8 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
@@ -632,10 +632,10 @@ index 947b0b10fb965f30513fd0df5bc0910fb9cb9a71..05d7e197da45579a28ef0180d6f43a5a
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index ba0412e8462372f5743e9282de6a50a45ee25add..5849c00a036b047903f6b7396f848a3e4970e204 100644
+index b5de069683a615be9b9b33c3d8e61e46bbbec8e3..6b0635d8621c76981ffa2004b3bfc617caeb60f8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -240,6 +240,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
+@@ -241,6 +241,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
  import org.yaml.snakeyaml.error.MarkedYAMLException;
  
  import net.md_5.bungee.api.chat.BaseComponent; // Spigot
@@ -643,7 +643,7 @@ index ba0412e8462372f5743e9282de6a50a45ee25add..5849c00a036b047903f6b7396f848a3e
  
  import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
-@@ -1200,7 +1201,8 @@ public final class CraftServer implements Server {
+@@ -1202,7 +1203,8 @@ public final class CraftServer implements Server {
          LevelSettings worldSettings;
          // See MinecraftServer.a(String, String, long, WorldType, JsonElement)
          if (worlddata == null) {
