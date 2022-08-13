@@ -5,7 +5,7 @@ Subject: [PATCH] Matter Branding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 74c91f79576e85618fefb79be8d313ba871701c7..4d6baf1b86a73fc3ab0a903055cbc756ef334b74 100644
+index 7074295d7399d03e259598bb4bfa0f21434d74be..c8a397317dcccc08334d7f250461aaac93c6b45f 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -9,7 +9,7 @@ plugins {
@@ -15,7 +15,7 @@ index 74c91f79576e85618fefb79be8d313ba871701c7..4d6baf1b86a73fc3ab0a903055cbc756
 -    implementation(project(":pufferfish-api")) // Pufferfish // Paper
 +    implementation(project(":matter-api")) // Matter // Pufferfish // Paper
      // Pufferfish start
-     implementation("io.papermc.paper:paper-mojangapi:1.19-R0.1-SNAPSHOT") {
+     implementation("io.papermc.paper:paper-mojangapi:1.19.2-R0.1-SNAPSHOT") {
          exclude("io.papermc.paper", "paper-api")
 @@ -84,7 +84,7 @@ tasks.jar {
          attributes(
@@ -40,10 +40,10 @@ index b0390eedb507d27426d1e1d73bd4ab63aec89ebe..1533dadb02f9d189be0e6725c73a28f2
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 67c4cd2fb3c64432b0390c9d497ef7067577c64a..a528897371f5187a07e6582461cec1e9c3e4c113 100644
+index 06d31a03ec7d049649e94d013429d2197b697545..82e07c1193dfccdeac6ba704a961a765c3b35194 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1657,7 +1657,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1658,7 +1658,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -53,10 +53,10 @@ index 67c4cd2fb3c64432b0390c9d497ef7067577c64a..a528897371f5187a07e6582461cec1e9
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 74498689dffa9a342880b15215d3dffd72895f6f..88f66decbecac1dc2556abdc866ba6d7102caa05 100644
+index edeaea986a01cbdcadd72ac7034d397e1f1b3cd5..26d1925e1dd65290cecea47c6bd1a5f7c9f3e300 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -247,7 +247,7 @@ import javax.annotation.Nullable; // Paper
+@@ -249,7 +249,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
@@ -66,7 +66,7 @@ index 74498689dffa9a342880b15215d3dffd72895f6f..88f66decbecac1dc2556abdc866ba6d7
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index c55ae77807e0ec3698f0d0443caaf18928b41017..c03aedff52a8c0fef875b8a2c667ba7e4abd1fa9 100644
+index 5b48047242e20c216b110502935763ea433c55cd..eb4531c8a3a57add40a9d835948c5206399afa29 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -270,7 +270,7 @@ public class Main {
@@ -79,7 +79,7 @@ index c55ae77807e0ec3698f0d0443caaf18928b41017..c03aedff52a8c0fef875b8a2c667ba7e
                          //Thread.sleep(TimeUnit.SECONDS.toMillis(20));
                          // Paper End
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 2d9c98931df5d1c54adcfba78a9136841764f853..2560c1c5d818d97d0c9394094d782b3833cdf7e7 100644
+index 522c519752d2fdb838bd797c77fdc7d0934b51e9..bb1504dc77bc683f3a09f19c7e521588bd423bfc 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -430,7 +430,7 @@ public final class CraftMagicNumbers implements UnsafeValues {

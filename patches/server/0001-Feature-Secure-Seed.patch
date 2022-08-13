@@ -631,10 +631,10 @@ index 947b0b10fb965f30513fd0df5bc0910fb9cb9a71..05d7e197da45579a28ef0180d6f43a5a
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 9a8a7eff47d40d6de558f0946c450531b3984f44..74498689dffa9a342880b15215d3dffd72895f6f 100644
+index bfd4520ef6f085685a25cf7f49907e16202e6386..edeaea986a01cbdcadd72ac7034d397e1f1b3cd5 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -241,6 +241,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
+@@ -243,6 +243,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
  import org.yaml.snakeyaml.error.MarkedYAMLException;
  
  import net.md_5.bungee.api.chat.BaseComponent; // Spigot
@@ -642,7 +642,7 @@ index 9a8a7eff47d40d6de558f0946c450531b3984f44..74498689dffa9a342880b15215d3dffd
  
  import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
-@@ -1202,7 +1203,8 @@ public final class CraftServer implements Server {
+@@ -1204,7 +1205,8 @@ public final class CraftServer implements Server {
          LevelSettings worldSettings;
          // See MinecraftServer.a(String, String, long, WorldType, JsonElement)
          if (worlddata == null) {
