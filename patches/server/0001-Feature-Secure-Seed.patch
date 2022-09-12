@@ -35,7 +35,7 @@ index a32cfa75a9bea896f558bab646d0868391b069a9..e8aad358f2f10b1637d6bb9d137d92bd
              long i = WorldGenSettings.parseSeed(this.levelSeed()).orElse(RandomSource.create().nextLong());
              Registry<WorldPreset> iregistry = dynamicRegistryManager.registryOrThrow(Registry.WORLD_PRESET_REGISTRY);
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 378cc1f9e19eb9b18037ab8af92f65897e15a405..33cb2fc823624b40a32c6f5513abb073214a8ffd 100644
+index 795691bcb61a7c2b4f903d8db3b6714908c78ac2..68af330e4d2cfe3db32f1f64d945f2bcb8e370ab 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -48,6 +48,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -46,7 +46,7 @@ index 378cc1f9e19eb9b18037ab8af92f65897e15a405..33cb2fc823624b40a32c6f5513abb073
  
  public class ServerChunkCache extends ChunkSource {
  
-@@ -1140,6 +1141,8 @@ public class ServerChunkCache extends ChunkSource {
+@@ -963,6 +964,8 @@ public class ServerChunkCache extends ChunkSource {
      }
  
      public ChunkGenerator getGenerator() {
@@ -56,7 +56,7 @@ index 378cc1f9e19eb9b18037ab8af92f65897e15a405..33cb2fc823624b40a32c6f5513abb073
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 0c71d72fb04eb00e159ddd456df82376fc912b4e..86bb20029def78a24971790e7076204ad81dd675 100644
+index 8ed9f14f1ca71111a8215b28821bd5e398c0d0a6..9adbc2b04c4ed8b761b1d74dd1126923fca142a1 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -172,6 +172,10 @@ import org.bukkit.event.world.TimeSkipEvent;
@@ -70,7 +70,7 @@ index 0c71d72fb04eb00e159ddd456df82376fc912b4e..86bb20029def78a24971790e7076204a
  public class ServerLevel extends Level implements WorldGenLevel {
  
      public static final BlockPos END_SPAWN_POINT = new BlockPos(100, 50, 0);
-@@ -528,6 +532,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -530,6 +534,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          }
          chunkgenerator.conf = spigotConfig; // Spigot
          // CraftBukkit end
@@ -617,7 +617,7 @@ index 36cd894c3a9261d6c3bda7178f4b4d4f1045bd11..e9cade3b86f6e24c6fa2064d6bbb92b3
  public class MineshaftStructure extends Structure {
      public static final Codec<MineshaftStructure> CODEC = RecordCodecBuilder.create((instance) -> {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index 947b0b10fb965f30513fd0df5bc0910fb9cb9a71..05d7e197da45579a28ef0180d6f43a5ab1da794f 100644
+index 4c109bbc4694e9d3d8804cc64650f79abf315e3a..cbd70e17963f1963af461c6fbe6e69c3b892a925 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 @@ -207,7 +207,8 @@ public class CraftChunk implements Chunk {

@@ -27,7 +27,7 @@ index 7074295d7399d03e259598bb4bfa0f21434d74be..c8a397317dcccc08334d7f250461aaac
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
 diff --git a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
-index b0390eedb507d27426d1e1d73bd4ab63aec89ebe..1533dadb02f9d189be0e6725c73a28f293e30160 100644
+index c5d5648f4ca603ef2b1df723b58f9caf4dd3c722..0132e6ab29ab64d74abae2b2a06a80abf9fa1038 100644
 --- a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
 +++ b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
 @@ -17,7 +17,7 @@ public final class PaperConsole extends SimpleTerminalConsole {
@@ -53,7 +53,7 @@ index 92f685b1b6015cdd3e6c50fd39a79e2ad187fc91..a8bd9606aa15fb2c913e64a7468d2267
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 6f2b371608267b3c5c4b2fbcf8ba3fe3d1615273..2beb5a34fb1470e586da455dc0f5b05061d588e6 100644
+index 0292fc6b01c08c629db4039d6bba4bab482e95c5..0e06c64d9bef380f361c45fb842f6e8b81b4b568 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -249,7 +249,7 @@ import javax.annotation.Nullable; // Paper
@@ -66,10 +66,10 @@ index 6f2b371608267b3c5c4b2fbcf8ba3fe3d1615273..2beb5a34fb1470e586da455dc0f5b050
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 56a784e943cb5d8b15b41e3e66545ebf166c221c..135922a892ac9205ef5dd58f23b46335f8830e0d 100644
+index f30621be24c6c3a4f173436fce1ad1c13507c84f..ab0d2c3c9fe7731e7900140cc6fd7149b65f24cb 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -276,7 +276,7 @@ public class Main {
+@@ -278,7 +278,7 @@ public class Main {
                      if (buildDate.before(deadline.getTime())) {
                          // Paper start - This is some stupid bullshit
                          System.err.println("*** Warning, you've not updated in a while! ***");
