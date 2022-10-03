@@ -35,7 +35,7 @@ index a32cfa75a9bea896f558bab646d0868391b069a9..e8aad358f2f10b1637d6bb9d137d92bd
              long i = WorldGenSettings.parseSeed(this.levelSeed()).orElse(RandomSource.create().nextLong());
              Registry<WorldPreset> iregistry = dynamicRegistryManager.registryOrThrow(Registry.WORLD_PRESET_REGISTRY);
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 795691bcb61a7c2b4f903d8db3b6714908c78ac2..68af330e4d2cfe3db32f1f64d945f2bcb8e370ab 100644
+index 7266e6703d5cd0fea90ec88c74a7d4567f2420ae..e34d1ae6aa24ff3127dd20de75aed068b3eadc2e 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 @@ -48,6 +48,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -46,7 +46,7 @@ index 795691bcb61a7c2b4f903d8db3b6714908c78ac2..68af330e4d2cfe3db32f1f64d945f2bc
  
  public class ServerChunkCache extends ChunkSource {
  
-@@ -963,6 +964,8 @@ public class ServerChunkCache extends ChunkSource {
+@@ -885,6 +886,8 @@ public class ServerChunkCache extends ChunkSource {
      }
  
      public ChunkGenerator getGenerator() {
@@ -56,7 +56,7 @@ index 795691bcb61a7c2b4f903d8db3b6714908c78ac2..68af330e4d2cfe3db32f1f64d945f2bc
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 8ed9f14f1ca71111a8215b28821bd5e398c0d0a6..9adbc2b04c4ed8b761b1d74dd1126923fca142a1 100644
+index f8750675044708e71dbf6293be6ce36bd6c510ca..589b343008a4310462c73b98359669ad04088bdd 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -172,6 +172,10 @@ import org.bukkit.event.world.TimeSkipEvent;
@@ -70,14 +70,14 @@ index 8ed9f14f1ca71111a8215b28821bd5e398c0d0a6..9adbc2b04c4ed8b761b1d74dd1126923
  public class ServerLevel extends Level implements WorldGenLevel {
  
      public static final BlockPos END_SPAWN_POINT = new BlockPos(100, 50, 0);
-@@ -530,6 +534,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -559,6 +563,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          }
          chunkgenerator.conf = spigotConfig; // Spigot
          // CraftBukkit end
 +        Globals.setupGlobals(this); // Matter
          boolean flag2 = minecraftserver.forceSynchronousWrites();
          DataFixer datafixer = minecraftserver.getFixerUpper();
-         EntityPersistentStorage<Entity> entitypersistentstorage = new EntityStorage(this, convertable_conversionsession.getDimensionPath(resourcekey).resolve("entities"), datafixer, flag2, minecraftserver);
+         this.entityStorage = new EntityRegionFileStorage(convertable_conversionsession.getDimensionPath(resourcekey).resolve("entities"), flag2); // Paper - rewrite chunk system  //EntityPersistentStorage<Entity> entitypersistentstorage = new EntityStorage(this, convertable_conversionsession.getDimensionPath(resourcekey).resolve("entities"), datafixer, flag2, minecraftserver);
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Slime.java b/src/main/java/net/minecraft/world/entity/monster/Slime.java
 index 7e85ad7ba31bbb32ea1e1dff5d1c83e7ce68b4b3..94a1868843407d421e6aa3b7719cff6727eb113c 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Slime.java
@@ -92,7 +92,7 @@ index 7e85ad7ba31bbb32ea1e1dff5d1c83e7ce68b4b3..94a1868843407d421e6aa3b7719cff67
              // Paper start - Replace rules for Height in Slime Chunks
              final double maxHeightSlimeChunk = world.getMinecraftWorld().paperConfig().entities.spawning.slimeSpawnHeight.slimeChunk.maximum;
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-index b68625ebb32b8d1e5bc232d7cc791edbed923378..2c154889869aa6f69fd7692e2a7d9fb41cdca31b 100644
+index 54e57791f6220325d05939decae46dc4d91d1906..72f536ca74b42e62229e047c664e9c6e98c9b592 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
 @@ -50,6 +50,7 @@ import net.minecraft.world.level.material.Fluid;
@@ -134,7 +134,7 @@ index b68625ebb32b8d1e5bc232d7cc791edbed923378..2c154889869aa6f69fd7692e2a7d9fb4
          return GameEventDispatcher.NOOP;
      }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
-index 19ffd93b7bc745d9a6822f1e5642d2f640f61df7..f5408410b4d6ff955b3838ecc7d25dfe83dbcb42 100644
+index cb64b46eb874bb7ce22cdbf9e9629c929a05fb61..9791c90a61e58b340d83b7f9e01a69a7b86c0be5 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 @@ -86,6 +86,11 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
@@ -197,7 +197,7 @@ index 19ffd93b7bc745d9a6822f1e5642d2f640f61df7..f5408410b4d6ff955b3838ecc7d25dfe
  
                      StructureSet.StructureSelectionEntry structureset_a1;
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java b/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java
-index e6240f891e396d91e31b02fdf3084be77e9d6697..06d4013467b55bb5096f410eb1abb4bcbeb9e8a3 100644
+index 00cb9dafc711607f28529ea9afbcdb492b1b2595..edb3fde9e3c9efa6fb0530696e5ac922e37930c2 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkStatus.java
 @@ -27,6 +27,10 @@ import net.minecraft.world.level.levelgen.Heightmap;
@@ -210,8 +210,8 @@ index e6240f891e396d91e31b02fdf3084be77e9d6697..06d4013467b55bb5096f410eb1abb4bc
 +
  public class ChunkStatus {
  
-     public static final int MAX_STRUCTURE_DISTANCE = 8;
-@@ -270,6 +274,7 @@ public class ChunkStatus {
+     // Paper start - rewrite chunk system
+@@ -299,6 +303,7 @@ public class ChunkStatus {
      }
  
      public CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> generate(Executor executor, ServerLevel world, ChunkGenerator generator, StructureTemplateManager structureTemplateManager, ThreadedLevelLightEngine lightingProvider, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> fullChunkConverter, List<ChunkAccess> chunks, boolean regenerate) {
@@ -617,7 +617,7 @@ index 36cd894c3a9261d6c3bda7178f4b4d4f1045bd11..e9cade3b86f6e24c6fa2064d6bbb92b3
  public class MineshaftStructure extends Structure {
      public static final Codec<MineshaftStructure> CODEC = RecordCodecBuilder.create((instance) -> {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index 4c109bbc4694e9d3d8804cc64650f79abf315e3a..cbd70e17963f1963af461c6fbe6e69c3b892a925 100644
+index 75c6b0aa2cb4ae8637460006ff24d7f6028396be..ef97300b46f6377f4906d7f150b4a2ddf4f60de3 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 @@ -207,7 +207,8 @@ public class CraftChunk implements Chunk {
@@ -631,7 +631,7 @@ index 4c109bbc4694e9d3d8804cc64650f79abf315e3a..cbd70e17963f1963af461c6fbe6e69c3
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 660d3f6e8a59751aa1d5b71f5bab72254b6065b8..0292fc6b01c08c629db4039d6bba4bab482e95c5 100644
+index b8efe50c860a7537f345f46f3b3d68906ad54006..6783ac95f43d70a1511c2577fc9d2e74ea704101 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -243,6 +243,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
@@ -642,7 +642,7 @@ index 660d3f6e8a59751aa1d5b71f5bab72254b6065b8..0292fc6b01c08c629db4039d6bba4bab
  
  import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
-@@ -1204,7 +1205,8 @@ public final class CraftServer implements Server {
+@@ -1209,7 +1210,8 @@ public final class CraftServer implements Server {
          LevelSettings worldSettings;
          // See MinecraftServer.a(String, String, long, WorldType, JsonElement)
          if (worlddata == null) {
