@@ -56,7 +56,7 @@ index 7266e6703d5cd0fea90ec88c74a7d4567f2420ae..e34d1ae6aa24ff3127dd20de75aed068
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index f8750675044708e71dbf6293be6ce36bd6c510ca..589b343008a4310462c73b98359669ad04088bdd 100644
+index e802ee2b2dc458f52dbce9746fc9891eebb6dcc1..9ec8de8d267cbca15041b21ab51ddf17c915b6d0 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -172,6 +172,10 @@ import org.bukkit.event.world.TimeSkipEvent;
@@ -70,7 +70,7 @@ index f8750675044708e71dbf6293be6ce36bd6c510ca..589b343008a4310462c73b98359669ad
  public class ServerLevel extends Level implements WorldGenLevel {
  
      public static final BlockPos END_SPAWN_POINT = new BlockPos(100, 50, 0);
-@@ -559,6 +563,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -561,6 +565,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          }
          chunkgenerator.conf = spigotConfig; // Spigot
          // CraftBukkit end
@@ -134,7 +134,7 @@ index 54e57791f6220325d05939decae46dc4d91d1906..72f536ca74b42e62229e047c664e9c6e
          return GameEventDispatcher.NOOP;
      }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
-index cb64b46eb874bb7ce22cdbf9e9629c929a05fb61..9791c90a61e58b340d83b7f9e01a69a7b86c0be5 100644
+index 52264a583e79cc6adb9967aebac7f6b3ac129017..9b5f93828d7fcc60563c4dbd0587f6f22d4566ee 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 @@ -86,6 +86,11 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
@@ -149,7 +149,7 @@ index cb64b46eb874bb7ce22cdbf9e9629c929a05fb61..9791c90a61e58b340d83b7f9e01a69a7
  public abstract class ChunkGenerator {
  
      private static final Logger LOGGER = LogUtils.getLogger();
-@@ -234,15 +239,9 @@ public abstract class ChunkGenerator {
+@@ -239,15 +244,9 @@ public abstract class ChunkGenerator {
              int j = concentricringsstructureplacement.count();
              int k = concentricringsstructureplacement.spread();
              HolderSet<Biome> holderset = concentricringsstructureplacement.preferredBiomes();
@@ -167,7 +167,7 @@ index cb64b46eb874bb7ce22cdbf9e9629c929a05fb61..9791c90a61e58b340d83b7f9e01a69a7
              double d0 = randomsource.nextDouble() * 3.141592653589793D * 2.0D;
              int l = 0;
              int i1 = 0;
-@@ -517,8 +516,12 @@ public abstract class ChunkGenerator {
+@@ -522,8 +521,12 @@ public abstract class ChunkGenerator {
                  return structure.step().ordinal();
              }));
              List<FeatureSorter.StepFeatureData> list = (List) this.featuresPerStep.get();
@@ -181,7 +181,7 @@ index cb64b46eb874bb7ce22cdbf9e9629c929a05fb61..9791c90a61e58b340d83b7f9e01a69a7
              Set<Holder<Biome>> set = new ObjectArraySet();
  
              ChunkPos.rangeClosed(sectionposition.chunk(), 1).forEach((chunkcoordintpair1) -> {
-@@ -777,9 +780,11 @@ public abstract class ChunkGenerator {
+@@ -782,9 +785,11 @@ public abstract class ChunkGenerator {
                      ArrayList<StructureSet.StructureSelectionEntry> arraylist = new ArrayList(list.size());
  
                      arraylist.addAll(list);
@@ -470,7 +470,7 @@ index edf51d1a11bc39364194bf325471082defae8589..b2340253efc1a38f987abbad191637c3
          int l = this.spreadType.evaluate(worldgenRandom, k);
          int m = this.spreadType.evaluate(worldgenRandom, k);
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
-index 2fd1284c7f0d8e2cf35d03072089256d990b06eb..f8afa1da8ab4cbd6c0501cd9936075a028afbd1f 100644
+index 8ef0e9fa126cd96289bab48eaa06c2a1fbe4281e..be9e9c60da83484721b8658a1d24b4b568c5cb78 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
 @@ -17,6 +17,8 @@ import net.minecraft.world.level.levelgen.LegacyRandomSource;
@@ -482,12 +482,14 @@ index 2fd1284c7f0d8e2cf35d03072089256d990b06eb..f8afa1da8ab4cbd6c0501cd9936075a0
  
  public abstract class StructurePlacement {
      public static final Codec<StructurePlacement> CODEC = Registry.STRUCTURE_PLACEMENT_TYPE.byNameCodec().dispatch(StructurePlacement::type, StructurePlacementType::codec);
-@@ -78,32 +80,43 @@ public abstract class StructurePlacement {
+@@ -89,39 +91,44 @@ public abstract class StructurePlacement {
+ 
      public abstract StructurePlacementType<?> type();
  
-     private static boolean probabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency) {
+-    private static boolean probabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper - ignore here
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
 -        worldgenRandom.setLargeFeatureWithSalt(seed, salt, chunkX, chunkZ);
++    private static boolean probabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency) {
 +        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
 +                chunkX, chunkZ, Globals.Salt.UNDEFINED, salt
@@ -496,9 +498,16 @@ index 2fd1284c7f0d8e2cf35d03072089256d990b06eb..f8afa1da8ab4cbd6c0501cd9936075a0
          return worldgenRandom.nextFloat() < frequency;
      }
  
-     private static boolean legacyProbabilityReducerWithDouble(long seed, int salt, int chunkX, int chunkZ, float frequency) {
+-    private static boolean legacyProbabilityReducerWithDouble(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
+-        if (saltOverride == null) { // Paper
 -        worldgenRandom.setLargeFeatureSeed(seed, chunkX, chunkZ);
+-        // Paper start
+-        } else {
+-            worldgenRandom.setLargeFeatureWithSalt(seed, chunkX, chunkZ, saltOverride);
+-        }
+-        // Paper end
++    private static boolean legacyProbabilityReducerWithDouble(long seed, int salt, int chunkX, int chunkZ, float frequency) {
 +        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
 +                chunkX, chunkZ, Globals.Salt.MINESHAFT_FEATURE, 0
@@ -507,9 +516,10 @@ index 2fd1284c7f0d8e2cf35d03072089256d990b06eb..f8afa1da8ab4cbd6c0501cd9936075a0
          return worldgenRandom.nextDouble() < (double)frequency;
      }
  
-     private static boolean legacyArbitrarySaltProbabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency) {
+-    private static boolean legacyArbitrarySaltProbabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setLargeFeatureWithSalt(seed, chunkX, chunkZ, 10387320);
+-        worldgenRandom.setLargeFeatureWithSalt(seed, chunkX, chunkZ, saltOverride != null ? saltOverride : 10387320); // Paper
++    private static boolean legacyArbitrarySaltProbabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency) {
 +        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
 +                chunkX, chunkZ, Globals.Salt.BURIED_TREASURE_FEATURE, 0
@@ -518,7 +528,7 @@ index 2fd1284c7f0d8e2cf35d03072089256d990b06eb..f8afa1da8ab4cbd6c0501cd9936075a0
          return worldgenRandom.nextFloat() < frequency;
      }
  
-     private static boolean legacyPillagerOutpostReducer(long seed, int salt, int chunkX, int chunkZ, float frequency) {
+     private static boolean legacyPillagerOutpostReducer(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper - ignore here
          int i = chunkX >> 4;
          int j = chunkZ >> 4;
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
