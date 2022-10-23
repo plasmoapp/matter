@@ -470,7 +470,7 @@ index edf51d1a11bc39364194bf325471082defae8589..b2340253efc1a38f987abbad191637c3
          int l = this.spreadType.evaluate(worldgenRandom, k);
          int m = this.spreadType.evaluate(worldgenRandom, k);
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
-index 8ef0e9fa126cd96289bab48eaa06c2a1fbe4281e..be9e9c60da83484721b8658a1d24b4b568c5cb78 100644
+index 8ef0e9fa126cd96289bab48eaa06c2a1fbe4281e..88e3c6aac0ed8096363d56cb3115fb0d636730ca 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
 @@ -17,6 +17,8 @@ import net.minecraft.world.level.levelgen.LegacyRandomSource;
@@ -482,14 +482,12 @@ index 8ef0e9fa126cd96289bab48eaa06c2a1fbe4281e..be9e9c60da83484721b8658a1d24b4b5
  
  public abstract class StructurePlacement {
      public static final Codec<StructurePlacement> CODEC = Registry.STRUCTURE_PLACEMENT_TYPE.byNameCodec().dispatch(StructurePlacement::type, StructurePlacementType::codec);
-@@ -89,39 +91,44 @@ public abstract class StructurePlacement {
- 
+@@ -90,38 +92,43 @@ public abstract class StructurePlacement {
      public abstract StructurePlacementType<?> type();
  
--    private static boolean probabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper - ignore here
+     private static boolean probabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper - ignore here
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
 -        worldgenRandom.setLargeFeatureWithSalt(seed, salt, chunkX, chunkZ);
-+    private static boolean probabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency) {
 +        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
 +                chunkX, chunkZ, Globals.Salt.UNDEFINED, salt
@@ -498,7 +496,7 @@ index 8ef0e9fa126cd96289bab48eaa06c2a1fbe4281e..be9e9c60da83484721b8658a1d24b4b5
          return worldgenRandom.nextFloat() < frequency;
      }
  
--    private static boolean legacyProbabilityReducerWithDouble(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper
+     private static boolean legacyProbabilityReducerWithDouble(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
 -        if (saltOverride == null) { // Paper
 -        worldgenRandom.setLargeFeatureSeed(seed, chunkX, chunkZ);
@@ -507,7 +505,6 @@ index 8ef0e9fa126cd96289bab48eaa06c2a1fbe4281e..be9e9c60da83484721b8658a1d24b4b5
 -            worldgenRandom.setLargeFeatureWithSalt(seed, chunkX, chunkZ, saltOverride);
 -        }
 -        // Paper end
-+    private static boolean legacyProbabilityReducerWithDouble(long seed, int salt, int chunkX, int chunkZ, float frequency) {
 +        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
 +                chunkX, chunkZ, Globals.Salt.MINESHAFT_FEATURE, 0
@@ -516,10 +513,9 @@ index 8ef0e9fa126cd96289bab48eaa06c2a1fbe4281e..be9e9c60da83484721b8658a1d24b4b5
          return worldgenRandom.nextDouble() < (double)frequency;
      }
  
--    private static boolean legacyArbitrarySaltProbabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper
+     private static boolean legacyArbitrarySaltProbabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
 -        worldgenRandom.setLargeFeatureWithSalt(seed, chunkX, chunkZ, saltOverride != null ? saltOverride : 10387320); // Paper
-+    private static boolean legacyArbitrarySaltProbabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency) {
 +        // Matter start
 +        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
 +                chunkX, chunkZ, Globals.Salt.BURIED_TREASURE_FEATURE, 0
