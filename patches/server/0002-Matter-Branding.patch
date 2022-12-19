@@ -5,7 +5,7 @@ Subject: [PATCH] Matter Branding
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 5b43f5c27ce903c53cbce245477fbdefdc88733f..47dd7583d833ee877145350c4ba6d5a18a0cff0c 100644
+index 04a1e3c9619b41f429bd598d55c9e0b5abaff920..73f8019ecf3bf914d63d2e2ffb658e7b56b00327 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -7,7 +7,7 @@ plugins {
@@ -17,7 +17,7 @@ index 5b43f5c27ce903c53cbce245477fbdefdc88733f..47dd7583d833ee877145350c4ba6d5a1
      // Pufferfish start
      implementation("io.papermc.paper:paper-mojangapi:1.19.2-R0.1-SNAPSHOT") {
          exclude("io.papermc.paper", "paper-api")
-@@ -82,7 +82,7 @@ tasks.jar {
+@@ -81,7 +81,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
@@ -40,7 +40,7 @@ index c5d5648f4ca603ef2b1df723b58f9caf4dd3c722..0132e6ab29ab64d74abae2b2a06a80ab
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 3cadf20891888b56ac70798d581d6a044a98c0a3..6e78262826ca430b30f1ec487a298390f59cd441 100644
+index 68d16efaf9c2d997afabadcf1ee24c5de685b5b3..57cc7dbabd799274f4065854e18f888d94765404 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1656,7 +1656,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -53,11 +53,11 @@ index 3cadf20891888b56ac70798d581d6a044a98c0a3..6e78262826ca430b30f1ec487a298390
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index ce8afc699918e9f4b121508fc3532b07ccb4f52f..e26bdb6968d6368c1f28fdd9fd92c9f4047d10ba 100644
+index 20cc64eb109988431cb752026c28c7f9e962d999..9e1d6871e096db5ca6b987649b4840aedc403242 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -249,7 +249,7 @@ import javax.annotation.Nullable; // Paper
- import javax.annotation.Nonnull; // Paper
+@@ -264,7 +264,7 @@ import javax.annotation.Nonnull; // Paper
+ import su.plo.matter.Globals;
  
  public final class CraftServer implements Server {
 -    private final String serverName = "Pufferfish"; // Paper // Pufferfish
@@ -66,7 +66,7 @@ index ce8afc699918e9f4b121508fc3532b07ccb4f52f..e26bdb6968d6368c1f28fdd9fd92c9f4
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index f30621be24c6c3a4f173436fce1ad1c13507c84f..ab0d2c3c9fe7731e7900140cc6fd7149b65f24cb 100644
+index 119d9bb5e41038704654e248bf168d22af246b7f..4064a573328d9ad6ce4e06dea63456fa69de93f1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -278,7 +278,7 @@ public class Main {
@@ -79,10 +79,10 @@ index f30621be24c6c3a4f173436fce1ad1c13507c84f..ab0d2c3c9fe7731e7900140cc6fd7149
                          //Thread.sleep(TimeUnit.SECONDS.toMillis(20));
                          // Paper End
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 05cc8f9cdcd7e920bf9503f68efb16cd74a359a2..f5235bd017e04dc5cf005fbaa511f52d29f99b3e 100644
+index a3c6b3dd87022e2def1f12da7c44c8d529191d1e..53032ab47936a707686b674ad0f7b226d89e82ea 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -430,7 +430,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -433,7 +433,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      @Override
      public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {

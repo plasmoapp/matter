@@ -5,14 +5,17 @@ Subject: [PATCH] Seed Command
 
 
 diff --git a/src/main/java/net/minecraft/server/commands/SeedCommand.java b/src/main/java/net/minecraft/server/commands/SeedCommand.java
-index 621b6f2072d1299855419f1b21dd4d1ea456282a..ba0fa148364744e55ab58128873d9eef09c20d56 100644
+index 9ca33c07a261316febdb0bd67cd716848064878e..5752b6fb33d0c27fc57d6e6f2fb3660fce4f1dee 100644
 --- a/src/main/java/net/minecraft/server/commands/SeedCommand.java
 +++ b/src/main/java/net/minecraft/server/commands/SeedCommand.java
-@@ -9,16 +9,31 @@ import net.minecraft.network.chat.Component;
+@@ -6,14 +6,34 @@ import net.minecraft.commands.Commands;
+ import net.minecraft.network.chat.Component;
  import net.minecraft.network.chat.ComponentUtils;
- import net.minecraft.network.chat.HoverEvent;
  
 +// Matter start
++import net.minecraft.ChatFormatting;
++import net.minecraft.network.chat.ClickEvent;
++import net.minecraft.network.chat.HoverEvent;
 +import su.plo.matter.Globals;
 +// Matter end
 +
@@ -22,15 +25,15 @@ index 621b6f2072d1299855419f1b21dd4d1ea456282a..ba0fa148364744e55ab58128873d9eef
              return !dedicated || source.hasPermission(2);
          }).executes((context) -> {
              long l = context.getSource().getLevel().getSeed();
--            Component component = ComponentUtils.wrapInSquareBrackets(Component.literal(String.valueOf(l)).withStyle((style) -> {
+-            Component component = ComponentUtils.copyOnClickText(String.valueOf(l));
+-            context.getSource().sendSuccess(Component.translatable("commands.seed.success", component), false);
 +            // Matter start - Seed Command
 +            Globals.setupGlobals(context.getSource().getLevel());
 +            String seedStr = Globals.seedToString(Globals.worldSeed);
 +
 +            Component seedComponent = ComponentUtils.wrapInSquareBrackets(Component.literal(String.valueOf(l)).withStyle((style) -> {
-                 return style.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(l))).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click"))).withInsertion(String.valueOf(l));
-             }));
--            context.getSource().sendSuccess(Component.translatable("commands.seed.success", component), false);
++                return style.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(l))).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click"))).withInsertion(String.valueOf(l));
++            }));
 +
 +            Component featureSeedComponent = ComponentUtils.wrapInSquareBrackets(Component.translatable("chat.copy.click").withStyle((style) -> {
 +                return style.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, seedStr)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click"))).withInsertion(seedStr);
@@ -42,15 +45,3 @@ index 621b6f2072d1299855419f1b21dd4d1ea456282a..ba0fa148364744e55ab58128873d9eef
              return (int)l;
          }));
      }
-diff --git a/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java b/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java
-index ec21a02832e88eba5d2566b557cc887006b62786..e470047a1c63c48b4c27d2511a6974512748c924 100644
---- a/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java
-+++ b/src/main/java/net/minecraft/world/level/levelgen/presets/WorldPreset.java
-@@ -15,6 +15,7 @@ import net.minecraft.resources.RegistryFileCodec;
- import net.minecraft.resources.ResourceKey;
- import net.minecraft.world.level.dimension.LevelStem;
- import net.minecraft.world.level.levelgen.WorldGenSettings;
-+import su.plo.matter.Globals;
- 
- // Matter start
- import su.plo.matter.Globals;
