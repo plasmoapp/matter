@@ -590,7 +590,7 @@ index f7e19bb7d2ff8f8aaf061cec16462913d77c10d5..999eac6b546fd09b2f35a34545e1f714
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 098b67e6ad74be7698713623ca7fae70f19ac6b3..20cc64eb109988431cb752026c28c7f9e962d999 100644
+index 277e8a03ab270eabb6b8c31d0076f3310c91eef2..71f7d110925b7243e66c01dd66ed92b85e0318dd 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -260,6 +260,9 @@ import net.md_5.bungee.api.chat.BaseComponent; // Spigot
@@ -603,8 +603,8 @@ index 098b67e6ad74be7698713623ca7fae70f19ac6b3..20cc64eb109988431cb752026c28c7f9
  public final class CraftServer implements Server {
      private final String serverName = "Pufferfish"; // Paper // Pufferfish
      private final String serverVersion;
-@@ -1227,7 +1230,8 @@ public final class CraftServer implements Server {
-             worlddata = (PrimaryLevelData) pair.getFirst();
+@@ -1228,7 +1231,8 @@ public final class CraftServer implements Server {
+             iregistry = pair.getSecond().dimensions();
          } else {
              LevelSettings worldsettings;
 -            WorldOptions worldoptions = new WorldOptions(creator.seed(), creator.generateStructures(), false);

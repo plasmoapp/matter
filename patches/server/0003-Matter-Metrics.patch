@@ -5,7 +5,7 @@ Subject: [PATCH] Matter Metrics
 
 
 diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
-index f2fe6ea3719ff8b2913b7a3a939d7a5b75cb8b28..12892dfe9a03c0142444ffba0edf43058715d650 100644
+index 692c962193cf9fcc6801fc93f3220bdc673d527b..67a31aabb7282fc113b4b91912350e01559a1a12 100644
 --- a/src/main/java/com/destroystokyo/paper/Metrics.java
 +++ b/src/main/java/com/destroystokyo/paper/Metrics.java
 @@ -593,7 +593,7 @@ public class Metrics {
@@ -17,13 +17,19 @@ index f2fe6ea3719ff8b2913b7a3a939d7a5b75cb8b28..12892dfe9a03c0142444ffba0edf4305
  
                  metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", () -> {
                      String minecraftVersion = Bukkit.getVersion();
-@@ -603,7 +603,8 @@ public class Metrics {
- 
-                 metrics.addCustomChart(new Metrics.SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
-                 metrics.addCustomChart(new Metrics.SimplePie("online_mode", () -> Bukkit.getOnlineMode() ? "online" : "offline"));
--                metrics.addCustomChart(new Metrics.SimplePie("pufferfish_version", () -> (Metrics.class.getPackage().getImplementationVersion() != null) ? Metrics.class.getPackage().getImplementationVersion() : "unknown"));
+@@ -607,11 +607,13 @@ public class Metrics {
+                 final String implVersion = org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion();
+                 if (implVersion != null) {
+                     final String buildOrHash = implVersion.substring(implVersion.lastIndexOf('-') + 1);
+-                    paperVersion = "git-Pufferfish-%s-%s".formatted(Bukkit.getServer().getMinecraftVersion(), buildOrHash); // Pufferfish
++                    paperVersion = "git-Matter-%s-%s".formatted(Bukkit.getServer().getMinecraftVersion(), buildOrHash); // Matter
+                 } else {
+                     paperVersion = "unknown";
+                 }
+-                metrics.addCustomChart(new Metrics.SimplePie("pufferfish_version", () -> paperVersion)); // Pufferfish
++
 +                metrics.addCustomChart(new Metrics.SimplePie("matter_type", () -> "Pufferfish")); // Matter
-+                metrics.addCustomChart(new Metrics.SimplePie("matter_version", () -> (Metrics.class.getPackage().getImplementationVersion() != null) ? Metrics.class.getPackage().getImplementationVersion() : "unknown"));
++                metrics.addCustomChart(new Metrics.SimplePie("matter_version", () -> paperVersion)); // Matter
  
                  metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
                      Map<String, Map<String, Integer>> map = new HashMap<>();
