@@ -788,16 +788,17 @@ index 0000000000000000000000000000000000000000..d18b15ca0b6585f08b30b019c8c17a0f
 +}
 diff --git a/src/main/java/su/plo/matter/WorldgenCryptoRandom.java b/src/main/java/su/plo/matter/WorldgenCryptoRandom.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1d76b84a4d9eeeb975efe9d7ba2440d31ab41ce7
+index 0000000000000000000000000000000000000000..fab359afe44c573b8b315115810ddefd85b4d22b
 --- /dev/null
 +++ b/src/main/java/su/plo/matter/WorldgenCryptoRandom.java
-@@ -0,0 +1,140 @@
+@@ -0,0 +1,159 @@
 +package su.plo.matter;
 +
 +import net.minecraft.util.Mth;
 +import net.minecraft.util.RandomSource;
 +import net.minecraft.world.level.levelgen.LegacyRandomSource;
 +import net.minecraft.world.level.levelgen.WorldgenRandom;
++import org.jetbrains.annotations.NotNull;
 +
 +import java.util.Arrays;
 +
@@ -818,7 +819,9 @@ index 0000000000000000000000000000000000000000..1d76b84a4d9eeeb975efe9d7ba2440d3
 +
 +    public WorldgenCryptoRandom(int x, int z, Globals.Salt typeSalt, long salt) {
 +        super(new LegacyRandomSource(0L));
-+        this.setSecureSeed(x, z, typeSalt, salt);
++        if (typeSalt != null) {
++            this.setSecureSeed(x, z, typeSalt, salt);
++        }
 +    }
 +
 +    public void setSecureSeed(int x, int z, Globals.Salt typeSalt, long salt) {
@@ -868,6 +871,22 @@ index 0000000000000000000000000000000000000000..1d76b84a4d9eeeb975efe9d7ba2440d3
 +
 +            return result;
 +        }
++    }
++
++    @Override
++    public @NotNull RandomSource fork() {
++        WorldgenCryptoRandom fork = new WorldgenCryptoRandom(0, 0, null, 0);
++
++        System.arraycopy(Globals.worldSeed, 0, fork.worldSeed, 0, Globals.WORLD_SEED_LONGS);
++        fork.message[0] = this.message[0];
++        fork.message[1] = this.message[1];
++        fork.message[2] = this.message[2];
++        fork.message[3] = this.message[3];
++        fork.randomBitIndex = this.randomBitIndex;
++        fork.counter = this.counter;
++        fork.nextLong();
++
++        return fork;
 +    }
 +
 +    @Override
